@@ -28,10 +28,10 @@ class Reponse
     private $vraiFaux;
 
     /**
-     * @ORM\OneToOne(targetEntity=Question::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=Question::class)
+     * @ORM\JoinColumn(name="questionId", referencedColumnName="id")
      */
-    private $idQuestion;
+    private $question;
 
     public function getId(): ?int
     {
@@ -62,14 +62,14 @@ class Reponse
         return $this;
     }
 
-    public function getIdQuestion(): ?Question
+    public function getQuestion(): ?Question
     {
-        return $this->idQuestion;
+        return $this->question;
     }
 
-    public function setIdQuestion(Question $idQuestion): self
+    public function setQuestion(?Question $question): self
     {
-        $this->idQuestion = $idQuestion;
+        $this->question = $question;
 
         return $this;
     }

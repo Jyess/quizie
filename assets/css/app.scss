@@ -1,0 +1,8 @@
+$primary: darken(#428bca, 20%);
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+//content bewteen header and footer
+#content {
+  margin: 30px;
+}

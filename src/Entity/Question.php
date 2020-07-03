@@ -25,7 +25,7 @@ class Question
     /**
      * @ORM\Column(type="integer")
      */
-    private $nbPointBonneReponse;
+    private $nbPointsBonneReponse;
 
     /**
      * @ORM\Column(type="integer")
@@ -36,7 +36,7 @@ class Question
      * @ORM\ManyToOne(targetEntity=Quiz::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idQuiz;
+    private $quiz;
 
     public function getId(): ?int
     {
@@ -55,14 +55,14 @@ class Question
         return $this;
     }
 
-    public function getNbPointBonneReponse(): ?int
+    public function getNbPointsBonneReponse(): ?int
     {
-        return $this->nbPointBonneReponse;
+        return $this->nbPointsBonneReponse;
     }
 
-    public function setNbPointBonneReponse(int $nbPointBonneReponse): self
+    public function setNbPointsBonneReponse(int $nbPointsBonneReponse): self
     {
-        $this->nbPointBonneReponse = $nbPointBonneReponse;
+        $this->nbPointsBonneReponse = $nbPointsBonneReponse;
 
         return $this;
     }
@@ -79,14 +79,14 @@ class Question
         return $this;
     }
 
-    public function getIdQuiz(): ?Quiz
+    public function getQuiz(): ?Quiz
     {
-        return $this->idQuiz;
+        return $this->quiz;
     }
 
-    public function setIdQuiz(?Quiz $idQuiz): self
+    public function setQuiz(?Quiz $quiz): self
     {
-        $this->idQuiz = $idQuiz;
+        $this->quiz = $quiz;
 
         return $this;
     }

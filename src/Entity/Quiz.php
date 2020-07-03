@@ -33,10 +33,16 @@ class Quiz
     private $cleAcces;
 
     /**
-     * @ORM\OneToMany(targetEntity=Utilisateur::class)
+     * @ORM\ManyToOne(targetEntity=Utilisateur::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idUtilisateurCreateur;
+    private $utilisateurCreateur;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $question;
 
     public function getId(): ?int
     {
@@ -79,14 +85,26 @@ class Quiz
         return $this;
     }
 
-    public function getIdUtilisateurCreateur(): ?Utilisateur
+    public function getUtilisateurCreateur(): ?Utilisateur
     {
-        return $this->idUtilisateurCreateur;
+        return $this->utilisateurCreateur;
     }
 
-    public function setIdUtilisateurCreateur(?Utilisateur $idUtilisateurCreateur): self
+    public function setUtilisateurCreateur(?Utilisateur $utilisateurCreateur): self
     {
-        $this->idUtilisateurCreateur = $idUtilisateurCreateur;
+        $this->utilisateurCreateur = $utilisateurCreateur;
+
+        return $this;
+    }
+
+    public function getQuestion(): ?Question
+    {
+        return $this->question;
+    }
+
+    public function setQuestion(?Question $question): self
+    {
+        $this->question = $question;
 
         return $this;
     }

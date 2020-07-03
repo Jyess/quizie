@@ -23,10 +23,16 @@ class Resultat
     private $score;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Quiz::class)
+     * @ORM\ManyToOne(targetEntity=quiz::class)
      * @ORM\JoinColumn(nullable=false)
      */
-    private $idQuiz;
+    private $quiz;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Reponse")
+     * @ORM\JoinColumn(name="reponseId", referencedColumnName="id")
+     */
+    private $reponse;
 
     public function getId(): ?int
     {
@@ -45,14 +51,26 @@ class Resultat
         return $this;
     }
 
-    public function getIdQuiz(): ?Quiz
+    public function getQuiz(): ?quiz
     {
-        return $this->idQuiz;
+        return $this->quiz;
     }
 
-    public function setIdQuiz(?Quiz $idQuiz): self
+    public function setQuiz(?quiz $quiz): self
     {
-        $this->idQuiz = $idQuiz;
+        $this->quiz = $quiz;
+
+        return $this;
+    }
+
+    public function getReponse(): ?reponse
+    {
+        return $this->reponse;
+    }
+
+    public function setReponse(?reponse $reponse): self
+    {
+        $this->reponse = $reponse;
 
         return $this;
     }
