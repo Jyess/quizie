@@ -25,12 +25,15 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+                {% if not app.user %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path("utilisateur_connexion") }}">Se connecter</a>
+                    <a class="nav-link" href="{{ path("security_connexion") }}">Se connecter</a>
                 </li>
+                {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Se déconnecter</a>
+                    <a class="nav-link" href="{{ path("security_deconnexion") }}">Se déconnecter</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
