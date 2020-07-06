@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\QuizRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
@@ -20,11 +21,14 @@ class Quiz
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Le quiz doit avoir un nom.")
      */
     private $intitule;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\Expression("(this.getPlageHoraireDebut() < this.getPlageHoraireFin()) or (this.getPlageHoraireDebut() == false and this.getPlageHoraireFin() == false)",
+     * message = "La date de début doit être antérieure à la date de fin.")
      */
     private $plageHoraireDebut;
 
@@ -44,11 +48,11 @@ class Quiz
      */
     private $utilisateurCreateur;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $question;
+//    /**
+//     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
+//     * @ORM\JoinColumn(nullable=false)
+//     */
+//    private $question;
 
     public function getId(): ?int
     {
@@ -115,24 +119,31 @@ class Quiz
         return $this;
     }
 
-    public function getQuestion(): ?Question
-    {
-        return $this->question;
-    }
+//    public function getQuestion(): ?Question
+//    {
+//        return $this->question;
+//    }
+//
+//    public function setQuestion(?Question $question): self
+//    {
+//        $this->question = $question;
+//
+//        return $this;
+//    }
 
-    public function setQuestion(?Question $question): self
-    {
-        $this->question = $question;
-
-        return $this;
-    }
-
-    public function invalidTimeRange(ExecutionContextInterface $context, $payload) {
-        if ($this->plageHoraireDebut < $this->plageHoraireFin) {
-            $context->buildViolation('La plage horaire de début doit être strictement inférieure à celle de fin.')
-                ->atPath('plageHoraireDebut')
-                ->atPath('plageHoraireFin')
-                ->addViolation();
+    /**
+     * Génère une chaîne de caractères alphanumérique aléatoire de 5 caractères par défaut.
+     * @param int $length
+     * @return string
+     */
+    public function generateRandomString($length = 5) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            //prend un chiffre random entre le premier caractere et le dernier
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
+        return $randomString;
     }
 }

@@ -17,23 +17,26 @@ class QuizController extends AbstractController
      */
     public function creerQuiz(Request $request)
     {
-        $quizForm = $this->createForm(CreateQuizType::class);
+        $quiz = new Quiz();
+        $quizForm = $this->createForm(CreateQuizType::class, $quiz);
         $quizForm->handleRequest($request);
 
         if ($quizForm->isSubmitted() && $quizForm->isValid()) {
-            $quizData = $quizForm->getData();
+            //si l'état est privé
+            if ($request->get("create_quiz")['etat']) {
+                $quiz->setCleAcces($quiz->generateRandomString());
+            }
 
-            $quiz = new Quiz();
-            $quiz->setIntitule($quizData['intitule']);
-            $quiz->setPlageHoraireDebut($quizData['plageHoraireDebut']);
-            $quiz->setPlageHoraireFin($quizData['plageHoraireFin']);
-            $quiz->setCleAcces($quizData['cleAcces']);
+            //set l'utilisateyur créateur du quiz
             $quiz->setUtilisateurCreateur($this->getUser());
 
             $entityMangager = $this->getDoctrine()->getManager();
             $entityMangager->persist($quiz);
             $entityMangager->flush();
         }
+
+        //reset le formulaire si retour en arrière
+//        $quizForm = $this->createForm(CreateQuizType::class);
 
         return $this->render('quiz/creer_quiz.html.twig', [
             'quiz_formulaire' => $quizForm->createView()

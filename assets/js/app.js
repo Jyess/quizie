@@ -21,7 +21,7 @@ require("bootstrap");
 require("@fortawesome/fontawesome-free/css/all.min.css");
 require("@fortawesome/fontawesome-free/js/all.js");
 
-//temp
+//temp, ajoute la classe bootstrap pour les select
 $(document).ready(function () {
   $("select").addClass("custom-select");
 });
