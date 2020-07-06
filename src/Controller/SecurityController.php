@@ -19,7 +19,7 @@ class SecurityController extends AbstractController
     {
         //si l'utilisateur est déjà connecté
         if ($this->getUser()) {
-            return $this->redirectToRoute('accueil_accueil');
+            return $this->redirectToRoute('accueil_index');
         }
 
         $loginForm = $this->createForm(LoginType::class);
@@ -42,5 +42,16 @@ class SecurityController extends AbstractController
      */
     public function logout()
     {
+    }
+
+    /**
+     * @Route("/mes-infos", name="security_mesInfos")
+     */
+    public function mesInfos() {
+        $utilisateur = $this->getUser();
+
+        return $this->render('security/infos.html.twig', [
+            'utilisateur' => $utilisateur
+        ]);
     }
 }

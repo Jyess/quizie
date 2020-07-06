@@ -8,7 +8,8 @@
         <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
 
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{#          <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>#}
+            <div class="alert alert-danger">L'adresse email ou le mot de passe est incorrect.</div>
         {% endif %}
 
         {{ form_start(login, {'attr' : { 'class' : ''}}) }}

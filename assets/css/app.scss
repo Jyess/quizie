@@ -1,8 +1,19 @@
-$primary: darken(#428bca, 20%);
+$primary: #036eaf;
+$secondary: #578f89;
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
 //content bewteen header and footer
 #content {
   margin: 30px;
+}
+
+.title {
+  font-family: "Varela Round";
+  font-weight: bold;
+  color: #212121;
+}
+
+.account {
+  font-size: 1.5rem;
 }
