@@ -4,11 +4,13 @@
 
 {% block body %}
     <div class="container">
-        <h1 class="title text-center">Création un quiz</h1>
+        <h1 class="title text-center">Création d'un quiz</h1>
 
         {{ form_start(quiz_formulaire) }}
 
-        {{ form_row(quiz_formulaire.intitule, {'label' : 'Nom du quiz', 'attr' : { 'class' : 'form-control'} }) }}
+        <div class="text-danger">{{ form_errors(quiz_formulaire.intitule) }}</div>
+        {{ form_label(quiz_formulaire.intitule, 'Nom du quiz') }}
+        {{ form_widget(quiz_formulaire.intitule, {'label' : 'Nom du quiz', 'attr' : { 'class' : 'form-control'} }) }}
 
         <div>
             <label class="mt-2">&Eacute;tat du quiz</label>
@@ -29,6 +31,8 @@
         </div>
 
         {{ form_help(quiz_formulaire.plageHoraireFin, {'help_attr' : { 'class' : 'optional d-none font-italic'} }) }}
+
+        <div class="mt-3 optional d-none text-danger">{{ form_errors(quiz_formulaire.plageHoraireDebut) }}</div>
 
         {{ form_row(quiz_formulaire.envoyer, {'attr' : { 'class' : 'btn btn-primary mt-3'} } ) }}
 
