@@ -19,12 +19,12 @@
         </div>
 
         <div class="row">
-            <div class="col">
+            <div class="col-lg-6 ">
                 {{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début', {'label_attr': {'class': 'optional d-none'}}) }}
                 {{ form_widget(quiz_formulaire.plageHoraireDebut, {'attr' : { 'class' : 'optional d-none'} }) }}
             </div>
 
-            <div class="col">
+            <div class="col-lg-6">
                 {{ form_label(quiz_formulaire.plageHoraireFin, 'Plage horaire de fin', {'label_attr': {'class': ' optional d-none'}}) }}
                 {{ form_widget(quiz_formulaire.plageHoraireFin, {'attr' : { 'class' : 'optional d-none'} }) }}
             </div>
@@ -43,5 +43,5 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('quiz') }}
+    {{ encore_entry_script_tags('quiz_js') }}
 {% endblock %}

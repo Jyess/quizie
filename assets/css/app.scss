@@ -3,17 +3,23 @@ $secondary: #578f89;
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
-//content bewteen header and footer
+//tout le contenu entre le header et le footer
 #content {
   margin: 30px;
 }
 
+#logo {
+  font-size: 2rem;
+}
+
+//police et couleur des titres
 .title {
-  font-family: "Varela Round";
+  font-family: "Varela Round", sans-serif;
   font-weight: bold;
   color: #212121;
 }
 
+//taille de l'icone compte de la navbar
 .account {
   font-size: 1.5rem;
 }

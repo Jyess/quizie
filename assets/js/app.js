@@ -21,7 +21,8 @@ require("bootstrap");
 require("@fortawesome/fontawesome-free/css/all.min.css");
 require("@fortawesome/fontawesome-free/js/all.js");
 
-//temp, ajoute la classe bootstrap pour les select
-$(document).ready(function () {
-  $("select").addClass("custom-select");
-});
+// const routes = require("../../public/js/fos_js_routes.json");
+// import Routing from "../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js";
+//
+// Routing.setRoutingData(routes);
+// Routing.generate("rep_log_list");

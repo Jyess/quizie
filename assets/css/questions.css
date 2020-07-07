@@ -1,0 +1,44 @@
+/*pour afficher la clé d'accès*/
+.code {
+  font-family: "Fira Code", serif;
+  font-size: 1.2rem;
+}
+
+/*icone de copie*/
+#copy {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+/*numéro de la question*/
+.questionNum {
+  font-size: 6rem;
+  font-family: Consolas;
+}
+
+/*là où on écrit la question*/
+textarea {
+  resize: none;
+}
+
+/*input des nb de points*/
+input[type="number"] {
+  width: 60px;
+}
+
+/*boutons crud pour une réponse*/
+.crud svg {
+  font-size: 1.3rem;
+}
+
+.addReponse svg {
+  font-size: 1.8rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.2s ease-out;
+}
+
+.addReponse svg:hover {
+  opacity: 1;
+  transition: 0.2s ease-in;
+}

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=QuestionRepository::class)
@@ -19,18 +20,22 @@ class Question
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Le quiz doit avoir un nom.")
+     * @Assert\Length(max = 255, maxMessage = "Le nom du quiz doit faire moins de 255 caractères.")
      */
     private $intitule;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Positive(message="Le nombre de points pour une bonne réponse doit être positif.")
      */
     private $nbPointsBonneReponse;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Negative(message="Le nombre de points pour une mauvaise réponse doit être négatif.")
      */
-    private $nbPointMauvaiseReponse;
+    private $nbPointsMauvaiseReponse;
 
     /**
      * @ORM\ManyToOne(targetEntity=Quiz::class)
@@ -67,14 +72,14 @@ class Question
         return $this;
     }
 
-    public function getNbPointMauvaiseReponse(): ?int
+    public function getNbPointsMauvaiseReponse(): ?int
     {
-        return $this->nbPointMauvaiseReponse;
+        return $this->nbPointsMauvaiseReponse;
     }
 
-    public function setNbPointMauvaiseReponse(int $nbPointMauvaiseReponse): self
+    public function setNbPointsMauvaiseReponse(int $nbPointsMauvaiseReponse): self
     {
-        $this->nbPointMauvaiseReponse = $nbPointMauvaiseReponse;
+        $this->nbPointsMauvaiseReponse = $nbPointsMauvaiseReponse;
 
         return $this;
     }

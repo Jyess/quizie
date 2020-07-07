@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Quiz;
+use DateTime;
 use PhpParser\Node\Stmt\Expression;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CreateQuizType extends AbstractType
+class QuizType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -29,12 +30,17 @@ class CreateQuizType extends AbstractType
                     'Privé' => 1
                 ],
                 'help' => "Un quiz public sera accessible par tous, un quiz privé sera protégé par un mot de passe.",
-                'mapped' => false
+                'mapped' => false,
+                'attr' => [
+                    'class' => 'custom-select'
+                ]
             ])
             ->add('plageHoraireDebut', DateTimeType::class, [
                 'required' => false,
-                'widget' => 'single_text'
-            ])
+                'widget' => 'single_text',
+                'attr' => [
+                    'min' => ( new \DateTime() )->format('d-m-Y H:i')
+                ]])
             ->add('plageHoraireFin', DateTimeType::class, [
                 'required' => false,
                 'widget' => 'single_text',

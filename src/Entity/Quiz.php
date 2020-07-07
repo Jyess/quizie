@@ -22,12 +22,13 @@ class Quiz
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Le quiz doit avoir un nom.")
+     * @Assert\Length(max = 255, maxMessage = "Le nom du quiz doit faire moins de 255 caractères.")
      */
     private $intitule;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\Expression("(this.getPlageHoraireDebut() < this.getPlageHoraireFin()) or (this.getPlageHoraireDebut() == false and this.getPlageHoraireFin() == false)",
+     * @Assert\Expression("(this.getPlageHoraireDebut() and this.getPlageHoraireFin() and this.getPlageHoraireDebut() < this.getPlageHoraireFin()) or (this.getPlageHoraireDebut() == false and this.getPlageHoraireFin() == false)",
      * message = "La date de début doit être antérieure à la date de fin.")
      */
     private $plageHoraireDebut;
@@ -48,11 +49,11 @@ class Quiz
      */
     private $utilisateurCreateur;
 
-//    /**
-//     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
-//     * @ORM\JoinColumn(nullable=false)
-//     */
-//    private $question;
+    /**
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $question;
 
     public function getId(): ?int
     {
@@ -119,17 +120,17 @@ class Quiz
         return $this;
     }
 
-//    public function getQuestion(): ?Question
-//    {
-//        return $this->question;
-//    }
-//
-//    public function setQuestion(?Question $question): self
-//    {
-//        $this->question = $question;
-//
-//        return $this;
-//    }
+    public function getQuestion(): ?Question
+    {
+        return $this->question;
+    }
+
+    public function setQuestion(?Question $question): self
+    {
+        $this->question = $question;
+
+        return $this;
+    }
 
     /**
      * Génère une chaîne de caractères alphanumérique aléatoire de 5 caractères par défaut.

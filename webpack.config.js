@@ -24,8 +24,10 @@ Encore
    * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
    */
   .addEntry("main_js", "./assets/js/app.js")
-  .addEntry("quiz", "./assets/js/quiz.js")
+  .addEntry("quiz_js", "./assets/js/quiz.js")
+  .addEntry("questions_js", "./assets/js/questions.js")
   .addEntry("main_css", "./assets/css/app.scss")
+  .addEntry("questions_css", "./assets/css/questions.css")
   //.addEntry('page1', './assets/js/page1.js')
   //.addEntry('page2', './assets/js/page2.js')
 
