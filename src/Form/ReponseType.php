@@ -16,9 +16,7 @@ class ReponseType extends AbstractType
         $builder
             ->add('intitule', TextareaType::class)
             ->add('vraiFaux', HiddenType::class)
-            ->add('question', HiddenType::class, [
-                'mapped' => false
-            ])
+            ->add('question', HiddenType::class)
         ;
     }
 

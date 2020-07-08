@@ -41,12 +41,10 @@ function displayOrHideOptionalFields() {
   }
 }
 
-$(document).ready(function () {
-  //de base tout est caché mais si le user fait une erreur et que l'état était privé, il faut réafficher de suite les fields
-  displayOrHideOptionalFields();
+//de base tout est caché mais si le user fait une erreur et que l'état était privé, il faut réafficher de suite les fields
+displayOrHideOptionalFields();
 
-  //quand on change d'état
-  $("#create_quiz_etat").change(function () {
-    displayOrHideOptionalFields();
-  });
+//quand on change d'état
+$("#create_quiz_etat").change(function () {
+  displayOrHideOptionalFields();
 });

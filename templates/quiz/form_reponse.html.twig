@@ -1,0 +1,18 @@
+{% block body %}
+
+    {{ form_start(reponseFormulaire) }}
+
+    <div class="row mx-auto">
+        <div class="col-10">
+            {{ form_widget(reponseFormulaire.intitule, {'attr' : { 'class' : 'p-4 rounded border-0 w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}
+        </div>
+        <div class="col-1 crud">
+            <div class="row py-1"><a href=""><i class="fas fa-times"></i></a></div>
+            <div class="row py-1"><a href=""><i class="fas fa-check"></i></a></div>
+            <div class="row py-1"><a href=""><i class="fas fa-edit"></i></a></div>
+        </div>
+    </div>
+
+    {{ form_end(reponseFormulaire) }}
+
+{% endblock %}

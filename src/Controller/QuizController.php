@@ -51,7 +51,7 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("voir-quiz/{idQuiz}", name="quiz_voirQuiz")
+     * @Route("/voir-quiz/{idQuiz}", name="quiz_voirQuiz")
      * @param $idQuiz
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -66,8 +66,36 @@ class QuizController extends AbstractController
 
         return $this->render('quiz/creer_questions.html.twig', [
             'quiz' => $quiz,
-            'questionFormObject' => $questionForm,
-            'reponseFormObject' => $reponseForm
+            'questionFormulaire' => $questionForm->createView(),
+            'reponseFormulaire' => $reponseForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/form-question", name="quiz_genererFormQuestion")
+     */
+    public function genererFormQuestion() {
+        $question = new Question();
+        $questionForm = $this->createForm(QuestionType::class, $question);
+
+        $reponse = new Reponse();
+        $reponseForm = $this->createForm(ReponseType::class, $reponse);
+
+        return $this->render('quiz/form_question.html.twig', [
+            'questionFormulaire' => $questionForm->createView(),
+            'reponseFormulaire' => $reponseForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/form-reponse", name="quiz_genererFormReponse")
+     */
+    public function genererFormReponse() {
+        $reponse = new Reponse();
+        $reponseForm = $this->createForm(ReponseType::class, $reponse);
+
+        return $this->render('quiz/form_reponse.html.twig', [
+            'reponseFormulaire' => $reponseForm->createView()
         ]);
     }
 }

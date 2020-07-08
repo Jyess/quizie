@@ -53,7 +53,7 @@ class Quiz
      * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $question;
+    private $questions;
 
     public function getId(): ?int
     {
@@ -120,16 +120,9 @@ class Quiz
         return $this;
     }
 
-    public function getQuestion(): ?Question
+    public function getQuestions(): ?Question
     {
-        return $this->question;
-    }
-
-    public function setQuestion(?Question $question): self
-    {
-        $this->question = $question;
-
-        return $this;
+        return $this->questions;
     }
 
     /**

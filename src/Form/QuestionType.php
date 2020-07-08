@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Question;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -29,6 +30,11 @@ class QuestionType extends AbstractType
                 'attr' => [
                     'max' => 0
                 ]
+            ])
+            ->add('reponses', CollectionType::class, [
+                'entry_type' => ReponseType::class,
+                'entry_options' => ['label' => false],
+                'allow_add' => true
             ])
             ->add('quiz', HiddenType::class, [
                 'mapped' => false

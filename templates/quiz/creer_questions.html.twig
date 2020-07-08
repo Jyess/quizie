@@ -9,74 +9,78 @@
 
 {% block body %}
     <div class="container">
-        <h1 class="title text-center mb-4">Ajoutez des questions à votre quiz</h1>
+        <div id="info-quiz">
+            <h1 class="title text-center mb-4">Ajoutez des questions à votre quiz</h1>
 
-        <div class="row mx-auto">
-            <div class="col">
-                <div class="row"><span class="font-weight-bold">Nom du quiz :</span></div>
-                <div class="row d-inline-block">
-                    {{ quiz.intitule|length > 20 ? quiz.intitule|slice(0,20) ~ '...' : quiz.intitule }}
+            <div class="row mx-auto">
+                <div class="col">
+                    <div class="row"><span class="font-weight-bold">Nom du quiz :</span></div>
+                    <div class="row d-inline-block">
+                        {{ quiz.intitule|length > 20 ? quiz.intitule|slice(0,20) ~ '...' : quiz.intitule }}
+                    </div>
                 </div>
-            </div>
 
-            {% if quiz.plageHoraireDebut %}
-            <div class="col">
-                <div class="row"><span class="font-weight-bold">Plage horaire de début :</span></div>
-                <div class="row">{{ quiz.plageHoraireDebut|date("d/m/Y h:i") }}</div>
-            </div>
-            <div class="col">
-                <div class="row"><span class="font-weight-bold">Plage horaire de fin :</span></div>
-                <div class="row">{{ quiz.plageHoraireFin|date("d/m/Y h:i") }}</div>
-            </div>
-            {% endif %}
+                {% if quiz.plageHoraireDebut %}
+                    <div class="col">
+                        <div class="row"><span class="font-weight-bold">Plage horaire de début :</span></div>
+                        <div class="row">{{ quiz.plageHoraireDebut|date("d/m/Y h:i") }}</div>
+                    </div>
+                    <div class="col">
+                        <div class="row"><span class="font-weight-bold">Plage horaire de fin :</span></div>
+                        <div class="row">{{ quiz.plageHoraireFin|date("d/m/Y h:i") }}</div>
+                    </div>
+                {% endif %}
 
-            {% if quiz.cleAcces %}
-            <div class="col">
-                <div class="row"><span class="font-weight-bold">Clé d'accès :</span></div>
-                <div class="row"><span class="code text-primary mr-2">{{ quiz.cleAcces }}</span> <i id="copy" class="far fa-copy my-auto"></i></div>
+                {% if quiz.cleAcces %}
+                    <div class="col">
+                        <div class="row"><span class="font-weight-bold">Clé d'accès :</span></div>
+                        <div class="row"><span class="code text-primary mr-2">{{ quiz.cleAcces }}</span> <i id="copy"
+                                                                                                            class="far fa-copy my-auto"></i>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
 
-        {# une question #}
+        <div id="questionsContainer">
 
-        {% for i in 1..11 %}
-            {% set questionFormulaire = questionFormObject.createView %}
-
+            {# debut bloc question #}
             {{ form_start(questionFormulaire) }}
 
             <div class="jumbotron mt-5 p-3">
 
                 <div class="row">
-                    <div class="col-2 text-center questionNum">{{ i }}</div>
+                    <div class="col-2 text-center questionNum">1</div>
                     <div class="col my-auto">
                         <div class="row align-middle">{{ form_widget(questionFormulaire.intitule, {'attr' : { 'class' : 'border-0 rounded w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}</div>
                     </div>
                 </div>
 
-                <div class="reponses">
-                    {% for j in 1..2 %}
-                        {%  set reponseFormulaire = reponseFormObject.createView %}
+                {% for reponse in questionFormulaire.reponses %}
+                    <li> test {{ form_row(reponse.intitule) }}</li>
+                {% endfor %}
 
-                        {{ form_start(reponseFormulaire) }}
+                <ul class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}">
 
-                        <div class="row mx-auto">
-                            <div class="col-10">
-                                {{ form_widget(reponseFormulaire.intitule, {'attr' : { 'class' : 'p-4 rounded border-0 w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}
-                            </div>
-                            <div class="col-1 crud">
-                                <div class="row py-1"><a href=""><i class="fas fa-times"></i></a></div>
-                                <div class="row py-1"><a href=""><i class="fas fa-check"></i></a></div>
-                                <div class="row py-1"><a href=""><i class="fas fa-edit"></i></a></div>
-                            </div>
-                        </div>
+{#                <div class="reponsesContainer">#}
+{#                    {{ form_start(reponseFormulaire) }}#}
 
-                        {{ form_end(reponseFormulaire) }}
-                    {% endfor %}
+{#                    <div class="row mx-auto">#}
+{#                        <div class="col-10">#}
+{#                            {{ form_widget(reponseFormulaire.intitule, {'attr' : { 'class' : 'p-4 rounded border-0 w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}#}
+{#                        </div>#}
+{#                        <div class="col-1 crud">#}
+{#                            <div class="row py-1"><a href=""><i class="fas fa-times"></i></a></div>#}
+{#                            <div class="row py-1"><a href=""><i class="fas fa-check"></i></a></div>#}
+{#                            <div class="row py-1"><a href=""><i class="fas fa-edit"></i></a></div>#}
+{#                        </div>#}
+{#                    </div>#}
 
-                    <div class="addReponse col-10 text-center">
-                        <i class="far fa-plus-square"></i>
-                    </div>
+{#                    {{ form_end(reponseFormulaire) }}#}
+{#                </div>#}
+
+                <div class="col-10 text-center">
+                    <i id="addReponse" class="addButton far fa-plus-square" title="Ajouter une réponse"></i>
                 </div>
 
                 <div class="col">
@@ -94,11 +98,17 @@
                     </div>
                 </div>
 
+                {{ form_row(questionFormulaire.quiz) }}
                 {{ form_row(questionFormulaire.valider, {'attr' : { 'class' : 'btn btn-primary '} }) }}
+                {{ form_end(questionFormulaire) }}
             </div>
 
-            {{ form_end(questionFormulaire) }}
-        {%  endfor %}
+            <div class="col text-center">
+                <i id="addQuestion" class="addButton far fa-plus-square" title="Ajouter une question"></i>
+            </div>
+            {# fin bloc question #}
+        </div>
+
     </div>
 {% endblock %}
 

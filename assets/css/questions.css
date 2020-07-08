@@ -31,14 +31,18 @@ input[type="number"] {
   font-size: 1.3rem;
 }
 
-.addReponse svg {
+.addButton {
   font-size: 1.8rem;
   cursor: pointer;
   opacity: 0.7;
   transition: 0.2s ease-out;
 }
 
-.addReponse svg:hover {
+.addButton:hover {
   opacity: 1;
   transition: 0.2s ease-in;
+}
+
+.loading {
+  font-size: 2rem;
 }

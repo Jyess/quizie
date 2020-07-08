@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\QuestionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -42,6 +43,17 @@ class Question
      * @ORM\JoinColumn(nullable=false)
      */
     private $quiz;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Reponse::class, mappedBy="Question")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $reponses;
+
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -94,5 +106,10 @@ class Question
         $this->quiz = $quiz;
 
         return $this;
+    }
+
+    public function getReponses(): ?ArrayCollection
+    {
+        return $this->reponses;
     }
 }
