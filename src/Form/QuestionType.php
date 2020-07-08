@@ -34,7 +34,8 @@ class QuestionType extends AbstractType
             ->add('reponses', CollectionType::class, [
                 'entry_type' => ReponseType::class,
                 'entry_options' => ['label' => false],
-                'allow_add' => true
+                'allow_add' => true,
+                'label' => ' '
             ])
             ->add('quiz', HiddenType::class, [
                 'mapped' => false

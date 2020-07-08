@@ -28,7 +28,7 @@ class Reponse
     private $vraiFaux;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Question::class)
+     * @ORM\ManyToOne(targetEntity=Question::class, inversedBy="reponses")
      * @ORM\JoinColumn(name="questionId", referencedColumnName="id")
      */
     private $question;

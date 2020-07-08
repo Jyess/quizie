@@ -26,8 +26,8 @@ class QuizType extends AbstractType
             ->add('etat', ChoiceType::class, [
                 'label' => 'Etat du quiz',
                 'choices' => [
-                    'Public' => 0,
-                    'Privé' => 1
+                    'Public' => '0',
+                    'Privé' => '1'
                 ],
                 'help' => "Un quiz public sera accessible par tous, un quiz privé sera protégé par un mot de passe.",
                 'mapped' => false,

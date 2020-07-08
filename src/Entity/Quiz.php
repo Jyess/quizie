@@ -44,13 +44,13 @@ class Quiz
     private $cleAcces;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Utilisateur::class)
+     * @ORM\ManyToOne(targetEntity=Utilisateur::class, inversedBy="quiz")
      * @ORM\JoinColumn(nullable=false)
      */
     private $utilisateurCreateur;
 
     /**
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="Quiz")
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="quiz")
      * @ORM\JoinColumn(nullable=false)
      */
     private $questions;

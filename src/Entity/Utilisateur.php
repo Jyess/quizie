@@ -34,6 +34,11 @@ class Utilisateur implements UserInterface
     private $email;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Quiz", mappedBy="utilisateurCreateur")
+     */
+    private $quiz;
+
+    /**
      * @ORM\Column(type="json")
      */
     private $roles = [];
@@ -144,5 +149,13 @@ class Utilisateur implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuiz()
+    {
+        return $this->quiz;
     }
 }

@@ -6,6 +6,7 @@
     <div class="container">
         <h1 class="title text-center">Création d'un quiz</h1>
 
+
         {{ form_start(quiz_formulaire) }}
 
         <div class="text-danger">{{ form_errors(quiz_formulaire.intitule) }}</div>
@@ -20,19 +21,19 @@
 
         <div class="row">
             <div class="col-lg-6 ">
-                {{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début', {'label_attr': {'class': 'optional d-none'}}) }}
-                {{ form_widget(quiz_formulaire.plageHoraireDebut, {'attr' : { 'class' : 'optional d-none'} }) }}
+                {{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début', {'label_attr': {'class': 'optional'}}) }}
+                {{ form_widget(quiz_formulaire.plageHoraireDebut, {'attr' : { 'class' : 'optional'} }) }}
             </div>
 
             <div class="col-lg-6">
-                {{ form_label(quiz_formulaire.plageHoraireFin, 'Plage horaire de fin', {'label_attr': {'class': ' optional d-none'}}) }}
-                {{ form_widget(quiz_formulaire.plageHoraireFin, {'attr' : { 'class' : 'optional d-none'} }) }}
+                {{ form_label(quiz_formulaire.plageHoraireFin, 'Plage horaire de fin', {'label_attr': {'class': ' optional'}}) }}
+                {{ form_widget(quiz_formulaire.plageHoraireFin, {'attr' : { 'class' : 'optional'} }) }}
             </div>
         </div>
 
-        {{ form_help(quiz_formulaire.plageHoraireFin, {'help_attr' : { 'class' : 'optional d-none font-italic'} }) }}
+        {{ form_help(quiz_formulaire.plageHoraireFin, {'help_attr' : { 'class' : 'optional font-italic'} }) }}
 
-        <div class="mt-3 optional d-none text-danger">{{ form_errors(quiz_formulaire.plageHoraireDebut) }}</div>
+        <div class="mt-3 optional text-danger">{{ form_errors(quiz_formulaire.plageHoraireDebut) }}</div>
 
         {{ form_row(quiz_formulaire.envoyer, {'attr' : { 'class' : 'btn btn-primary mt-3'} } ) }}
 

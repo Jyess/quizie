@@ -28,7 +28,7 @@ class QuizController extends AbstractController
 
         if ($quizForm->isSubmitted() && $quizForm->isValid()) {
             //si l'état est privé
-            if ($request->get("create_quiz")['etat']) {
+            if ($request->get("quiz")['etat']) {
                 $quiz->setCleAcces($quiz->generateRandomString());
             }
 

@@ -12,36 +12,38 @@
             </div>
         </div>
 
-        <div class="reponsesContainer">
-            {{ form_start(reponseFormulaire) }}
+        <div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
 
-            <div class="row mx-auto">
-                <div class="col-10">
-                    {{ form_widget(reponseFormulaire.intitule, {'attr' : { 'class' : 'p-4 rounded border-0 w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}
-                </div>
-                <div class="col-1 crud">
-                    <div class="row py-1"><a href=""><i class="fas fa-times"></i></a></div>
-                    <div class="row py-1"><a href=""><i class="fas fa-check"></i></a></div>
-                    <div class="row py-1"><a href=""><i class="fas fa-edit"></i></a></div>
-                </div>
-            </div>
+        {#                <div class="reponsesContainer">#}
+        {#                    {{ form_start(reponseFormulaire) }}#}
 
-            {{ form_end(reponseFormulaire) }}
-        </div>
+        {#                    <div class="row mx-auto">#}
+        {#                        <div class="col-10">#}
+        {#                            {{ form_widget(reponseFormulaire.intitule, {'attr' : { 'class' : 'p-4 rounded border-0 w-100 mr-4', 'placeholder' : 'Entrez votre question ici'} }) }}#}
+        {#                        </div>#}
+        {#                        <div class="col-1 crud">#}
+        {#                            <div class="row py-1"><a href=""><i class="fas fa-times"></i></a></div>#}
+        {#                            <div class="row py-1"><a href=""><i class="fas fa-check"></i></a></div>#}
+        {#                            <div class="row py-1"><a href=""><i class="fas fa-edit"></i></a></div>#}
+        {#                        </div>#}
+        {#                    </div>#}
 
-        <div class="col-10 text-center">
-            <i id="addReponse" class="addButton far fa-plus-square" title="Ajouter une réponse"></i>
-        </div>
+        {#                    {{ form_end(reponseFormulaire) }}#}
+        {#                </div>#}
+
+        {#                <div class="col-10 text-center">#}
+        {#                    <i id="addReponse" class="addButton far fa-plus-square" title="Ajouter une réponse"></i>#}
+        {#                </div>#}
 
         <div class="col">
             <div class="row my-2">
-                {{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points pour une bonne réponse', { 'label_attr' : { 'class' : 'col-4' } }) }}
+                {{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points pour une bonne réponse', { 'label_attr' : { 'class' : 'col-5' } }) }}
                 {{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : ''} }) }}
                 <span class="px-2">points</span>
                 {{ form_help(questionFormulaire.nbPointsBonneReponse, {'help_attr' : { 'class' : 'text-success'}}) }}
             </div>
             <div class="row my-2">
-                {{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points pour une mauvaise réponse', { 'label_attr' : { 'class' : 'col-4' } }) }}
+                {{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points pour une mauvaise réponse', { 'label_attr' : { 'class' : 'col-5' } }) }}
                 {{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : ''} }) }}
                 <span class="px-2">points</span>
                 {{ form_help(questionFormulaire.nbPointsMauvaiseReponse, {'help_attr' : { 'class' : 'text-danger'}}) }}
@@ -54,7 +56,7 @@
     </div>
 
     <div class="col text-center">
-        <i id="addQuestion" class="addButton far fa-plus-square" title="Ajouter une question"></i>
+        <button id="addQuestion" class="btn btn-primary addButton">Ajouter une question</button>
     </div>
     {# fin bloc question #}
 
