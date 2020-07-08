@@ -11,6 +11,7 @@ use App\Form\ReponseType;
 use App\Repository\QuizRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class QuizController extends AbstractController
@@ -18,7 +19,7 @@ class QuizController extends AbstractController
     /**
      * @Route("/creer-quiz", name="quiz_creerQuiz")
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function creerQuiz(Request $request)
     {
@@ -53,7 +54,7 @@ class QuizController extends AbstractController
     /**
      * @Route("/voir-quiz/{idQuiz}", name="quiz_voirQuiz")
      * @param $idQuiz
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function voirQuiz($idQuiz, QuizRepository $repository) {
         $quiz = $repository->find($idQuiz);
@@ -61,13 +62,9 @@ class QuizController extends AbstractController
         $question = new Question();
         $questionForm = $this->createForm(QuestionType::class, $question);
 
-        $reponse = new Reponse();
-        $reponseForm = $this->createForm(ReponseType::class, $reponse);
-
         return $this->render('quiz/creer_questions.html.twig', [
             'quiz' => $quiz,
-            'questionFormulaire' => $questionForm->createView(),
-            'reponseFormulaire' => $reponseForm->createView()
+            'questionFormulaire' => $questionForm->createView()
         ]);
     }
 
@@ -88,14 +85,20 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/form-reponse", name="quiz_genererFormReponse")
+     * @Route("/save-question", name="quiz_enregistrerQuestion")
+     * @param Request $request
+     * @return Response
      */
-    public function genererFormReponse() {
-        $reponse = new Reponse();
-        $reponseForm = $this->createForm(ReponseType::class, $reponse);
+    public function enregistrerQuestion(Request $request) {
+        $question = new Question();
+        $questionForm = $this->createForm(QuestionType::class, $question);
+        $questionForm->handleRequest($request);
 
-        return $this->render('quiz/form_reponse.html.twig', [
-            'reponseFormulaire' => $reponseForm->createView()
-        ]);
+        if ($questionForm->isValid()) {
+            $entityMangager = $this->getDoctrine()->getManager();
+            $entityMangager->persist($question);
+            $entityMangager->flush();
+        }
     }
+
 }

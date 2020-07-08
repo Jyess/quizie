@@ -26,11 +26,6 @@ input[type="number"] {
   width: 60px;
 }
 
-/*boutons crud pour une réponse*/
-.crud svg {
-  font-size: 1.3rem;
-}
-
 /*bouton ajout (question et reponse)*/
 .addButton {
   font-size: 1.8rem;

@@ -3,7 +3,7 @@ const $ = require("jquery");
 /*
 initialise une variable correspondant à l'id d'une question
  */
-let idQuestion = 1;
+let $idQuestion = 1;
 
 /**
  * Ajoute du texte dans le presse papier
@@ -33,7 +33,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 
   // Replace '__name__' in the prototype's HTML to
   // instead be a number based on how many items we have
-  formulaireReponse = formulaireReponse.replace(/__name__/g, index);
+  formulaireReponse = formulaireReponse.replace(/__name__label__/g, index);
 
   // increase the index with one for the next item
   $reponsesContainer.data("index", index + 1);
@@ -45,7 +45,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
   $buttonContainer.before(nouveauFormulaire);
 
   //css
-  $(".reponse").addClass("p-4 rounded border-0 w-100 mr-4");
+  $(".reponse textarea").addClass("p-2 rounded border-0 w-100 mr-4");
 }
 
 /**
@@ -75,48 +75,80 @@ function boutonAjoutReponses(idQuestion) {
   });
 }
 
-/*
-Copie la clé d'accès dans le presse papier au clic du bouton "copier"
-*/
-$(document).on("click", ".fa-copy", function () {
-  copyToClipboard($(".code").html());
-});
+function changeOrdreQuestion() {
+  /*lors de la suppression d'une question*/
+  // met le bon numéro de question en cas de suppression
+  // pour tous les formulaires de question créés
+  $("#questionsContainer > form").each(function (index) {
+    //pour commencer à 1
+    index++;
 
-/*
-Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
-*/
-$(document).on("click", "#addQuestion", function (e) {
-  //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
-  $("#addQuestion").parent().remove();
+    //change le html du numéro de la question (commence à 1) par son index
+    $("#question" + index + " .questionNum").html(index);
+  });
+}
 
-  //ajoute une icone de chargement
-  $("body").append(
-    '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
-  );
+$(document).ready(function () {
+  /*
+  Copie la clé d'accès dans le presse papier au clic du bouton "copier"
+  */
+  $(document).on("click", ".fa-copy", function () {
+    copyToClipboard($(".code").html());
+  });
 
-  //requete ajax pour afficher le formulaire d'une question
-  $.ajax({
-    url: "/form-question", //route qui genere la view
-  })
-    .done(function (view) {
-      $(".loading").parent().remove(); //on enlève l'icone de chargement
-      $("#questionsContainer").append(view); //on ajoute la vue
+  /*
+  Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
+  */
+  $(document).on("click", "#addQuestion", function (e) {
+    //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
+    $("#addQuestion").parent().remove();
 
-      //ajout de l'id du bloc question
-      $("#questionsContainer > form ")
-        .last() //au dernier formulaire ajouté
-        .attr("id", "question" + idQuestion);
+    //ajoute une icone de chargement
+    $("body").append(
+      '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
+    );
 
-      //ajoute le bouton "Ajouter une reponse"
-      boutonAjoutReponses(idQuestion);
-
-      // incrémente l'id de la question
-      idQuestion++;
-
-      //scroll vers le bas pour afficher le bloc question
-      $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+    //requete ajax pour afficher le formulaire d'une question
+    $.ajax({
+      url: "/form-question", //route qui genere la view
     })
-    .fail(function (error) {
-      alert("Une erreur est survenue. Merci de réessayer.");
-    });
+      .done(function (view) {
+        $(".loading").parent().remove(); //on enlève l'icone de chargement
+        $("#questionsContainer").append(view); //on ajoute la vue
+
+        //ajout de l'id du bloc question
+        $("#questionsContainer > form ")
+          .last() //au dernier formulaire ajouté
+          .attr("id", "question" + $idQuestion);
+
+        //ajoute le bouton "Ajouter une reponse"
+        boutonAjoutReponses($idQuestion);
+
+        changeOrdreQuestion();
+
+        // incrémente l'id de la question
+        $idQuestion++;
+
+        //scroll vers le bas pour afficher le bloc question
+        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+      })
+      .fail(function (error) {
+        alert("Une erreur est survenue. Merci de réessayer.");
+      });
+  });
+
+  /*submit question*/
+  $("#question1").submit(function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      url: "/save-question", //route qui va recup les data et enregistrer la question dans la bd
+    })
+      .done(function (view) {
+        alert("ok");
+      })
+      .fail(function (error) {
+        alert("Une erreur est survenue. Merci de réessayer.");
+      });
+  });
 });
