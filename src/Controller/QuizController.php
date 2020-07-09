@@ -54,7 +54,7 @@ class QuizController extends AbstractController
             $entityMangager->persist($quiz);
             $entityMangager->flush();
 
-            return $this->redirectToRoute("quiz_voirQuiz", [
+            return $this->redirectToRoute("quiz_modifierQuiz", [
                 'idQuiz' => $quiz->getId()
             ]);
         }
@@ -66,11 +66,11 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/voir-quiz/{idQuiz}", name="quiz_voirQuiz")
+     * @Route("/modifier-quiz/{idQuiz}", name="quiz_modifierQuiz")
      * @param $idQuiz
      * @return Response
      */
-    public function voirQuiz($idQuiz, QuizRepository $repository) {
+    public function modifierQuiz($idQuiz, QuizRepository $repository) {
         $quiz = $repository->find($idQuiz);
 
         $question = new Question();
@@ -89,51 +89,38 @@ class QuizController extends AbstractController
         $question = new Question();
         $questionForm = $this->createForm(QuestionType::class, $question);
 
-        $reponse = new Reponse();
-        $reponseForm = $this->createForm(ReponseType::class, $reponse);
-
         return $this->render('quiz/form_question.html.twig', [
-            'questionFormulaire' => $questionForm->createView(),
-            'reponseFormulaire' => $reponseForm->createView()
+            'questionFormulaire' => $questionForm->createView()
         ]);
     }
 
     /**
-     * @Route("/save-question", name="quiz_enregistrerQuestion")
+     * @Route("/save-question/{idQuiz}", name="quiz_enregistrerQuestion", options = { "expose" = true })
      * @param Request $request
      */
-    public function enregistrerQuestion(Request $request, QuizRepository $repository, ValidatorInterface $validator) {
-        $response = new Response();
-
-        if ($request->isXmlHttpRequest()) {
-            $questionData = $request->request->all()["question"];
-
+    public function enregistrerQuestion(Request $request, QuizRepository $repository, $idQuiz) {
+        if ($request->isMethod(Request::METHOD_POST)) {
             $question = new Question();
-            $question->setIntitule($questionData["intitule"]);
-            $question->setNbPointsBonneReponse($questionData["nbPointsBonneReponse"]);
-            $question->setNbPointsMauvaiseReponse($questionData["nbPointsMauvaiseReponse"]);
+            $questionForm = $this->createForm(QuestionType::class, $question);
 
-            $quiz = $repository->find($questionData["quiz"]);
-            $question->setQuiz($quiz);
+            $questionForm->handleRequest($request);
 
-            $errors = $validator->validate($question);
+            if ($questionForm->isSubmitted() && $questionForm->isValid()) {
+                $quiz = $repository->find($idQuiz);
+                $question->setQuiz($quiz);
 
-            if (count($errors) > 0) {
-                $arrayErrors = [];
-                foreach ($errors as $error) {
-                    array_push($arrayErrors, $error->getMessage());
-                }
-                return new JsonResponse(['msg' => $arrayErrors]);
-//                return $response->setStatusCode('400');
+                $entityMangager = $this->getDoctrine()->getManager();
+                $entityMangager->persist($question);
+                $entityMangager->flush();
+
+                return new JsonResponse(['code' => 201], 201);
             }
 
-            $entityMangager = $this->getDoctrine()->getManager();
-            $entityMangager->persist($question);
-            $entityMangager->flush();
-
-            return $response->setStatusCode('200');
+            return $this->render('quiz/form_question.html.twig', [
+                'questionFormulaire' => $questionForm->createView()
+            ]);
         }
 
-        return $response->setStatusCode('401');
+        return new JsonResponse(['code' => 406], 406);
     }
 }

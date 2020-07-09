@@ -112,4 +112,12 @@ class Question
     {
         return $this->reponses;
     }
+
+    public function addReponse(Reponse $reponse) {
+        $this->reponses->add($reponse);
+    }
+
+    public function removeReponse(Reponse $reponse) {
+        $this->reponses->removeElement($reponse);
+    }
 }

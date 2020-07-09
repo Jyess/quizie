@@ -78,16 +78,52 @@ function boutonAjoutReponses(idQuestion) {
 }
 
 function changeOrdreQuestion() {
-  /*lors de la suppression d'une question*/
-  // met le bon numéro de question en cas de suppression
+  // met le numéro de chaque question dans l'ordre
   // pour tous les formulaires de question créés
   $("#questionsContainer > form").each(function (index) {
-    //pour commencer à 1
     index++;
-
-    //change le html du numéro de la question (commence à 1) par son index
-    $("#question" + index + " .questionNum").html(index);
+    $(this).find(".questionNum").html(index);
   });
+}
+
+/**
+ * Créer un formulaire pour ajouter une question
+ */
+function ajoutFormulaireQuestion() {
+  //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
+  // $("#addQuestion").parent().remove();
+
+  //ajoute une icone de chargement
+  $("body").append(
+    '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
+  );
+
+  //requete ajax pour afficher le formulaire d'une question
+  $.ajax({
+    url: "/form-question", //route qui genere la view
+  })
+    .done(function (view) {
+      $(".loading").parent().remove(); //on enlève l'icone de chargement
+      $("#questionsContainer").append(view); //on ajoute la vue
+      changeOrdreQuestion();
+
+      //ajout de l'id du bloc question
+      $("#questionsContainer > form ")
+        .last() //au dernier formulaire ajouté
+        .attr("id", "question" + $idQuestion);
+
+      //ajoute le bouton "Ajouter une reponse"
+      boutonAjoutReponses($idQuestion);
+
+      // incrémente l'id de la question
+      $idQuestion++;
+
+      //scroll vers le bas pour afficher le bloc question
+      $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+    })
+    .fail(function (error) {
+      alert("Une erreur est survenue. Merci de réessayer.");
+    });
 }
 
 $(document).ready(function () {
@@ -102,21 +138,34 @@ $(document).ready(function () {
   Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
   */
   $(document).on("click", "#addQuestion", function (e) {
-    //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
-    $("#addQuestion").parent().remove();
+    ajoutFormulaireQuestion();
+  });
 
-    //ajoute une icone de chargement
-    $("body").append(
-      '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
-    );
+  /*submit question*/
+  $("body").on("submit", "form", function (e) {
+    e.preventDefault();
 
-    //requete ajax pour afficher le formulaire d'une question
+    //l'element fomrmulaire actuel
+    let $formulaireActuel = $(this);
+
+    //recup l'id du quiz dans l'htlm
+    let $quizIdHolder = $(".js-quiz-id");
+    let $quizId = $quizIdHolder.data("quizId");
+
+    //data du formulaire
+    let $form = $("form").serialize();
+
+    //envoie les data
     $.ajax({
-      url: "/form-question", //route qui genere la view
+      type: "POST",
+      data: $form,
+      // url: Routing.generate("quiz_enregistrerQuestion"), //route qui va recup les data et enregistrer la question dans la bd
+      url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd
     })
       .done(function (view) {
-        $(".loading").parent().remove(); //on enlève l'icone de chargement
+        $formulaireActuel.remove();
         $("#questionsContainer").append(view); //on ajoute la vue
+        changeOrdreQuestion();
 
         //ajout de l'id du bloc question
         $("#questionsContainer > form ")
@@ -126,74 +175,29 @@ $(document).ready(function () {
         //ajoute le bouton "Ajouter une reponse"
         boutonAjoutReponses($idQuestion);
 
-        changeOrdreQuestion();
-
         // incrémente l'id de la question
         $idQuestion++;
-
-        //scroll vers le bas pour afficher le bloc question
-        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
       })
       .fail(function (error) {
-        alert("Une erreur est survenue. Merci de réessayer.");
-      });
-  });
-
-  /*submit question*/
-  $("body").on("submit", "form", function (e) {
-    e.preventDefault();
-
-    //recup l'id du quiz dans l'htlm
-    let $quizIdHolder = $(".js-quiz-id");
-    let $quizId = $quizIdHolder.data("quizId");
-
-    //rajoute l'id dans le formulaire
-    let $form = $("form").serializeArray();
-    $.each($form, function (index) {
-      if ($form[index].name === "question[quiz]") {
-        $form[index].value = $quizId;
-      }
-    });
-
-    let $formulaireActuel = $(this);
-
-    //envoie les data
-    $.ajax({
-      type: "POST",
-      data: $form,
-      dataType: "json",
-      url: "/save-question", //route qui va recup les data et enregistrer la question dans la bd
-    })
-      .done(function (view) {
-        if (view) {
-          $($formulaireActuel)
-            .find(".errorContainer")
-            .append("<div class='errors alert alert-danger'></div>");
-          $(".errors").html(view.msg);
-        } else {
-          $(".errors").hide();
-        }
-      })
-      .fail(function (error) {
-        console.log(error);
+        console.log("error");
       });
   });
 
   /* nb points aleatoire bonne reponse */
   $(document).on("click", "#js-random-point-1", function (e) {
-    console.log(
-      $(this)
-        .siblings("input")
-        .val(Math.ceil(Math.random() * 20))
-    );
+    $(this)
+      .siblings("input")
+      .val(Math.ceil(Math.random() * 20));
   });
 
   /* nb points aleatoire mauvaise reponse */
   $(document).on("click", "#js-random-point-2", function (e) {
-    console.log(
-      $(this)
-        .siblings("input")
-        .val(Math.floor(Math.random() * -20))
-    );
+    $(this)
+      .siblings("input")
+      .val(Math.floor(Math.random() * -20));
   });
+
+  // $(window).on("beforeunload", function () {
+  //   return ""; //inutile car pas afficher
+  // });
 });

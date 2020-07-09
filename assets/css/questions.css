@@ -45,9 +45,15 @@ input[type="number"] {
   color: #578f89;
 }
 
+/*icone aleatoire pour le nombre de points par question*/
 .random {
   font-size: 1.5rem;
   margin: auto 0;
   color: #578f89;
   cursor: pointer;
+  transition: 0.2s ease-out;
+}
+.random:hover {
+  color: #346661;
+  transition: 0.2s ease-in;
 }
