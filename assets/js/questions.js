@@ -50,7 +50,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 
 /**
  * Ajoute un bouton avec un listener au bon bloc question
- * @param idQuestion identifie l'id de la question
+ * @param idQuestion id de la question (#question1)
  */
 function boutonAjoutReponses(idQuestion) {
   let $reponsesContainer;
@@ -60,7 +60,7 @@ function boutonAjoutReponses(idQuestion) {
   let $buttonContainer = $("<div></div>").append($boutonAjoutReponse);
 
   // Get the ul that holds the collection of tags
-  $reponsesContainer = $("#question" + idQuestion + " div.reponses");
+  $reponsesContainer = $(idQuestion + " div.reponses");
 
   // add the "add a tag" anchor and li to the tags ul
   $reponsesContainer.append($buttonContainer);
@@ -71,7 +71,7 @@ function boutonAjoutReponses(idQuestion) {
 
   $boutonAjoutReponse.on("click", function (e) {
     ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
-    if ($("#question" + idQuestion + " .reponses").children().length - 1 >= 4) {
+    if ($(idQuestion + " .reponses").children().length - 1 >= 4) {
       $(this).remove();
     }
   });
@@ -80,7 +80,7 @@ function boutonAjoutReponses(idQuestion) {
 function changeOrdreQuestion() {
   // met le numéro de chaque question dans l'ordre
   // pour tous les formulaires de question créés
-  $("#questionsContainer > form").each(function (index) {
+  $("#questionsContainer > div.form").each(function (index) {
     index++;
     $(this).find(".questionNum").html(index);
   });
@@ -108,12 +108,12 @@ function ajoutFormulaireQuestion() {
       changeOrdreQuestion();
 
       //ajout de l'id du bloc question
-      $("#questionsContainer > form ")
+      $("#questionsContainer > div.form")
         .last() //au dernier formulaire ajouté
         .attr("id", "question" + $idQuestion);
 
       //ajoute le bouton "Ajouter une reponse"
-      boutonAjoutReponses($idQuestion);
+      boutonAjoutReponses("#question" + $idQuestion);
 
       // incrémente l'id de la question
       $idQuestion++;
@@ -146,37 +146,37 @@ $(document).ready(function () {
     e.preventDefault();
 
     //l'element fomrmulaire actuel
-    let $formulaireActuel = $(this);
+    let $submittedForm = $(this);
 
     //recup l'id du quiz dans l'htlm
     let $quizIdHolder = $(".js-quiz-id");
     let $quizId = $quizIdHolder.data("quizId");
 
     //data du formulaire
-    let $form = $("form").serialize();
+    let $formData = $submittedForm.serialize();
 
     //envoie les data
     $.ajax({
       type: "POST",
-      data: $form,
+      data: $formData,
       // url: Routing.generate("quiz_enregistrerQuestion"), //route qui va recup les data et enregistrer la question dans la bd
-      url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd
+      url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd,
+      success: function (data, textStatus, xhr) {
+        if (xhr.status === 200) {
+          let $formHolder = $submittedForm.parent();
+          $submittedForm.remove(); //enleve le formulaire
+          $($formHolder).append(data); //on ajoute le nouveau formulaire avec erreurs au holder
+
+          //met dans le bon ordre des questions
+          changeOrdreQuestion();
+
+          //ajoute le bouton "Ajouter une reponse"
+          boutonAjoutReponses($($formHolder).attr("id"));
+        }
+      },
     })
-      .done(function (view) {
-        $formulaireActuel.remove();
-        $("#questionsContainer").append(view); //on ajoute la vue
-        changeOrdreQuestion();
-
-        //ajout de l'id du bloc question
-        $("#questionsContainer > form ")
-          .last() //au dernier formulaire ajouté
-          .attr("id", "question" + $idQuestion);
-
-        //ajoute le bouton "Ajouter une reponse"
-        boutonAjoutReponses($idQuestion);
-
-        // incrémente l'id de la question
-        $idQuestion++;
+      .done(function (data) {
+        console.log("done");
       })
       .fail(function (error) {
         console.log("error");
