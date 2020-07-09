@@ -70,8 +70,10 @@ function boutonAjoutReponses(idQuestion) {
   $reponsesContainer.data("index", $reponsesContainer.find("input").length);
 
   $boutonAjoutReponse.on("click", function (e) {
-    // add a new tag form (see next code block)
     ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
+    if ($("#question" + idQuestion + " .reponses").children().length - 1 >= 4) {
+      $(this).remove();
+    }
   });
 }
 
@@ -138,17 +140,60 @@ $(document).ready(function () {
   });
 
   /*submit question*/
-  $("#question1").submit(function (e) {
+  $("body").on("submit", "form", function (e) {
     e.preventDefault();
 
+    //recup l'id du quiz dans l'htlm
+    let $quizIdHolder = $(".js-quiz-id");
+    let $quizId = $quizIdHolder.data("quizId");
+
+    //rajoute l'id dans le formulaire
+    let $form = $("form").serializeArray();
+    $.each($form, function (index) {
+      if ($form[index].name === "question[quiz]") {
+        $form[index].value = $quizId;
+      }
+    });
+
+    let $formulaireActuel = $(this);
+
+    //envoie les data
     $.ajax({
+      type: "POST",
+      data: $form,
+      dataType: "json",
       url: "/save-question", //route qui va recup les data et enregistrer la question dans la bd
     })
       .done(function (view) {
-        alert("ok");
+        if (view) {
+          $($formulaireActuel)
+            .find(".errorContainer")
+            .append("<div class='errors alert alert-danger'></div>");
+          $(".errors").html(view.msg);
+        } else {
+          $(".errors").hide();
+        }
       })
       .fail(function (error) {
-        alert("Une erreur est survenue. Merci de réessayer.");
+        console.log(error);
       });
+  });
+
+  /* nb points aleatoire bonne reponse */
+  $(document).on("click", "#js-random-point-1", function (e) {
+    console.log(
+      $(this)
+        .siblings("input")
+        .val(Math.ceil(Math.random() * 20))
+    );
+  });
+
+  /* nb points aleatoire mauvaise reponse */
+  $(document).on("click", "#js-random-point-2", function (e) {
+    console.log(
+      $(this)
+        .siblings("input")
+        .val(Math.floor(Math.random() * -20))
+    );
   });
 });

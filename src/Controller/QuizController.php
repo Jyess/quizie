@@ -9,10 +9,18 @@ use App\Form\QuizType;
 use App\Form\QuestionType;
 use App\Form\ReponseType;
 use App\Repository\QuizRepository;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Constraints\Json;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class QuizController extends AbstractController
 {
@@ -26,6 +34,12 @@ class QuizController extends AbstractController
         $quiz = new Quiz();
         $quizForm = $this->createForm(QuizType::class, $quiz);
         $quizForm->handleRequest($request);
+
+//        $errors = $validator->validate($quiz);
+
+//        if (count($errors) > 0) {
+//dump($errors);
+//        }
 
         if ($quizForm->isSubmitted() && $quizForm->isValid()) {
             //si l'état est privé
@@ -87,18 +101,39 @@ class QuizController extends AbstractController
     /**
      * @Route("/save-question", name="quiz_enregistrerQuestion")
      * @param Request $request
-     * @return Response
      */
-    public function enregistrerQuestion(Request $request) {
-        $question = new Question();
-        $questionForm = $this->createForm(QuestionType::class, $question);
-        $questionForm->handleRequest($request);
+    public function enregistrerQuestion(Request $request, QuizRepository $repository, ValidatorInterface $validator) {
+        $response = new Response();
 
-        if ($questionForm->isValid()) {
+        if ($request->isXmlHttpRequest()) {
+            $questionData = $request->request->all()["question"];
+
+            $question = new Question();
+            $question->setIntitule($questionData["intitule"]);
+            $question->setNbPointsBonneReponse($questionData["nbPointsBonneReponse"]);
+            $question->setNbPointsMauvaiseReponse($questionData["nbPointsMauvaiseReponse"]);
+
+            $quiz = $repository->find($questionData["quiz"]);
+            $question->setQuiz($quiz);
+
+            $errors = $validator->validate($question);
+
+            if (count($errors) > 0) {
+                $arrayErrors = [];
+                foreach ($errors as $error) {
+                    array_push($arrayErrors, $error->getMessage());
+                }
+                return new JsonResponse(['msg' => $arrayErrors]);
+//                return $response->setStatusCode('400');
+            }
+
             $entityMangager = $this->getDoctrine()->getManager();
             $entityMangager->persist($question);
             $entityMangager->flush();
-        }
-    }
 
+            return $response->setStatusCode('200');
+        }
+
+        return $response->setStatusCode('401');
+    }
 }

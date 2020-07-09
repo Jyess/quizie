@@ -5,6 +5,8 @@
 
     <div class="jumbotron mt-5 p-3">
 
+        <div class="errorContainer"></div>
+
         <div class="row">
             <div class="col-2 text-center questionNum">1</div>
             <div class="col my-auto">
@@ -12,7 +14,7 @@
             </div>
         </div>
 
-        <div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
+        <div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype.intitule)|e('html_attr') }}"></div>
 
         {#                <div class="reponsesContainer">#}
         {#                    {{ form_start(reponseFormulaire) }}#}
@@ -38,13 +40,15 @@
         <div class="col">
             <div class="row my-2">
                 {{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points pour une bonne réponse', { 'label_attr' : { 'class' : 'col-5' } }) }}
-                {{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : ''} }) }}
+                <i id="js-random-point-1" class="random fas fa-random"></i>
+                {{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2'} }) }}
                 <span class="px-2">points</span>
                 {{ form_help(questionFormulaire.nbPointsBonneReponse, {'help_attr' : { 'class' : 'text-success'}}) }}
             </div>
             <div class="row my-2">
                 {{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points pour une mauvaise réponse', { 'label_attr' : { 'class' : 'col-5' } }) }}
-                {{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : ''} }) }}
+                <i id="js-random-point-2" class="random fas fa-random"></i>
+                {{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2'} }) }}
                 <span class="px-2">points</span>
                 {{ form_help(questionFormulaire.nbPointsMauvaiseReponse, {'help_attr' : { 'class' : 'text-danger'}}) }}
             </div>
