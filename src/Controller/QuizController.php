@@ -105,6 +105,8 @@ class QuizController extends AbstractController
 
             $questionForm->handleRequest($request);
 
+            dd($question);
+
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
                 $quiz = $repository->find($idQuiz);
                 $question->setQuiz($quiz);

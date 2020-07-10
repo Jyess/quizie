@@ -33,16 +33,19 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 
   // Replace '__name__' in the prototype's HTML to
   // instead be a number based on how many items we have
-  formulaireReponse = formulaireReponse.replace(/__name__label__/g, index);
+  formulaireReponse = formulaireReponse.replace(/__name__/g, index);
 
   // increase the index with one for the next item
   $reponsesContainer.data("index", index + 1);
 
   // Display the form in the page in an li, before the "Add a tag" link li
-  let nouveauFormulaire = $("<div class='reponse'></div>").append(
+  let $nouveauFormulaire = $("<div class='reponse'></div>").append(
     formulaireReponse
   );
-  $buttonContainer.before(nouveauFormulaire);
+  $buttonContainer.before($nouveauFormulaire);
+
+  //ajout du bouton pour delete un reponse
+  $($nouveauFormulaire).append('<i class="delete fas fa-times"></i>');
 
   //css
   $(".reponse textarea").addClass("p-2 rounded border-0 w-100 mr-4");
@@ -148,6 +151,11 @@ $(document).ready(function () {
     //l'element fomrmulaire actuel
     let $submittedForm = $(this);
 
+    //affiche une icone de chargement
+    $($submittedForm)
+      .find("button[type='submit']")
+      .append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+
     //recup l'id du quiz dans l'htlm
     let $quizIdHolder = $(".js-quiz-id");
     let $quizId = $quizIdHolder.data("quizId");
@@ -162,6 +170,10 @@ $(document).ready(function () {
       // url: Routing.generate("quiz_enregistrerQuestion"), //route qui va recup les data et enregistrer la question dans la bd
       url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd,
       success: function (data, textStatus, xhr) {
+        //enleve l'icone de chargement
+        $($submittedForm).find("button[type='submit'] svg").remove();
+
+        //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
         if (xhr.status === 200) {
           let $formHolder = $submittedForm.parent();
           $submittedForm.remove(); //enleve le formulaire
@@ -172,6 +184,9 @@ $(document).ready(function () {
 
           //ajoute le bouton "Ajouter une reponse"
           boutonAjoutReponses($($formHolder).attr("id"));
+        } else {
+          //si on revoie un code 201, la requete a mené à la creation d'une ressource
+          $($submittedForm).find("button[type='submit']").remove();
         }
       },
     })
@@ -180,6 +195,7 @@ $(document).ready(function () {
       })
       .fail(function (error) {
         console.log("error");
+        $($submittedForm).find("button[type='submit'] svg").remove();
       });
   });
 
@@ -195,6 +211,19 @@ $(document).ready(function () {
     $(this)
       .siblings("input")
       .val(Math.floor(Math.random() * -20));
+  });
+
+  //TODO
+  /*supprime le textarea reponse*/
+  /*TODO penser aussi a verifier que le user a pas deja écrit une reponse avant de suppr, le prevenir*/
+  $(document).on("click", ".delete", function (e) {
+    // $(this).parent().remove();
+    //
+    // console.log($(this).parent().parent());
+    // if ($(this).parent().children().length - 1 === 4) {
+    //   console.log("ok");
+    //   boutonAjoutReponses($(this).closest("div.form").attr("id"));
+    // }
   });
 
   // $(window).on("beforeunload", function () {

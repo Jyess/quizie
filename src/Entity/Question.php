@@ -47,7 +47,7 @@ class Question
     private $quiz;
 
     /**
-     * @ORM\OneToMany(targetEntity=Reponse::class, mappedBy="question")
+     * @ORM\ManyToMany(targetEntity=Reponse::class, mappedBy="question", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $reponses;
@@ -117,7 +117,9 @@ class Question
 
     public function addReponse(Reponse $reponse)
     {
-        $this->reponses->add($reponse);
+        if (!$this->reponses->contains($reponse)) {
+            $this->reponses->add($reponse);
+        }
     }
 
     public function removeReponse(Reponse $reponse)

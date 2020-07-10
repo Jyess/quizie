@@ -1,3 +1,10 @@
+:root {
+  --secondary: #578f89;
+  --secondary-darker: #346661;
+}
+
+/*todo clas animation avec les transitions*/
+
 /*pour afficher la clé d'accès*/
 .code {
   font-family: "Fira Code", serif;
@@ -42,18 +49,39 @@ input[type="number"] {
 .loading {
   font-size: 2.5rem;
   margin: 30px 0;
-  color: #578f89;
+  color: var(--secondary);
 }
 
 /*icone aleatoire pour le nombre de points par question*/
 .random {
   font-size: 1.5rem;
   margin: auto 0;
-  color: #578f89;
+  color: var(--secondary);
   cursor: pointer;
   transition: 0.2s ease-out;
 }
 .random:hover {
-  color: #346661;
+  color: var(--secondary-darker);
+  transition: 0.2s ease-in;
+}
+
+/*bloc reponse (textarea et bouton delete ci-dessous*/
+.reponse {
+  position: relative;
+}
+
+/*icone pour enlever une réponse ou vider le champ*/
+.delete {
+  position: absolute;
+  right: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 15px;
+  cursor: pointer;
+  color: var(--secondary);
+  transition: 0.2s ease-out;
+}
+.delete:hover {
+  color: var(--secondary-darker);
   transition: 0.2s ease-in;
 }
