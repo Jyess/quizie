@@ -26,11 +26,29 @@
 /*là où on écrit la question*/
 textarea {
   resize: none;
+  font-family: "Roboto Medium", sans-serif;
+}
+
+input {
+  border: none;
+  border-radius: 2px;
+  height: 40px;
+  margin: auto 0;
+}
+
+/*textarea des reponses*/
+.reponse textarea {
+  border: none;
+  border-radius: 2px;
+  width: 100%;
+  padding: 7px 10px;
 }
 
 /*input des nb de points*/
 input[type="number"] {
   width: 60px;
+  text-align: center;
+  font-family: "Roboto Medium", sans-serif;
 }
 
 /*bouton ajout (question et reponse)*/
@@ -84,4 +102,14 @@ input[type="number"] {
 .delete:hover {
   color: var(--secondary-darker);
   transition: 0.2s ease-in;
+}
+
+/*couleur des mauvaises reponses*/
+.reponses textarea {
+  background-color: rgba(215, 103, 94, 0.2);
+}
+
+/*couleur des bonnes reponses*/
+.reponses .reponse:first-child textarea {
+  background-color: rgba(130, 215, 94, 0.2);
 }

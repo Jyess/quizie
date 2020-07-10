@@ -28,7 +28,7 @@ class QuestionType extends AbstractType
             ->add('nbPointsMauvaiseReponse', IntegerType::class, [
                 'help' => "(doit être négatif)",
                 'attr' => [
-                    'max' => 0
+                    'max' => -1
                 ]
             ])
             ->add('reponses', CollectionType::class, [
@@ -42,7 +42,9 @@ class QuestionType extends AbstractType
             ->add('quiz', HiddenType::class, [
                 'mapped' => false
             ])
-            ->add('valider', SubmitType::class)
+            ->add('valider', SubmitType::class, [
+                'label' => 'Enregistrer la question'
+            ])
         ;
     }
 

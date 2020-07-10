@@ -5,6 +5,11 @@ initialise une variable correspondant à l'id d'une question
  */
 let $idQuestion = 1;
 
+/*
+initialise une variable correspondant à l'id de la question dans la bd
+ */
+let $idBDQuestion = 0;
+
 /**
  * Ajoute du texte dans le presse papier
  * @param text
@@ -44,18 +49,18 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
   );
   $buttonContainer.before($nouveauFormulaire);
 
-  //ajout du bouton pour delete un reponse
-  $($nouveauFormulaire).append('<i class="delete fas fa-times"></i>');
-
-  //css
-  $(".reponse textarea").addClass("p-2 rounded border-0 w-100 mr-4");
+  //change les labels des réponses
+  $(".reponse label").each(function (index) {
+    $(this).html("Réponse fausse"); //d'abord tous réponse fausse
+    $(".reponses .reponse").first().find("label").html("Réponse juste"); //premier label de chaque question
+  });
 }
 
 /**
  * Ajoute un bouton avec un listener au bon bloc question
  * @param idQuestion id de la question (#question1)
  */
-function boutonAjoutReponses(idQuestion) {
+function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
   let $boutonAjoutReponse = $(
     '<button type="button" class="btn btn-primary">Ajouter une réponse</button>'
@@ -71,6 +76,11 @@ function boutonAjoutReponses(idQuestion) {
   // count the current form inputs we have (e.g. 2), use that as the new
   // index when inserting a new item (e.g. 2)
   $reponsesContainer.data("index", $reponsesContainer.find("input").length);
+
+  //affiche les deux réponses par défaut (juste/fausse)
+  for (let $i = 1; $i < 3; $i++) {
+    ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
+  }
 
   $boutonAjoutReponse.on("click", function (e) {
     ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
@@ -107,7 +117,11 @@ function ajoutFormulaireQuestion() {
   })
     .done(function (view) {
       $(".loading").parent().remove(); //on enlève l'icone de chargement
-      $("#questionsContainer").append(view); //on ajoute la vue
+
+      let $formHolder = $("<div class='form'></div>");
+      $("#questionsContainer").append($formHolder);
+      $formHolder.append(view);
+
       changeOrdreQuestion();
 
       //ajout de l'id du bloc question
@@ -115,8 +129,8 @@ function ajoutFormulaireQuestion() {
         .last() //au dernier formulaire ajouté
         .attr("id", "question" + $idQuestion);
 
-      //ajoute le bouton "Ajouter une reponse"
-      boutonAjoutReponses("#question" + $idQuestion);
+      //ajoute les formulaires des reponses
+      boutonAjoutReponsesEtFormulaires("#question" + $idQuestion);
 
       // incrémente l'id de la question
       $idQuestion++;
@@ -127,6 +141,40 @@ function ajoutFormulaireQuestion() {
     .fail(function (error) {
       alert("Une erreur est survenue. Merci de réessayer.");
     });
+}
+
+/**
+ * Permet de modifier un formulaire question
+ */
+function modifierFormulaireQuestion() {
+  $("body").on("submit", "form", function (e) {
+    e.preventDefault();
+
+    //l'element fomrmulaire actuel
+    let $submittedForm = $(this);
+
+    //affiche une icone de chargement
+    $($submittedForm)
+      .find("button[type='submit']")
+      .append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+
+    //envoie les data
+    $.ajax({
+      type: "GET",
+      // route qui va recup la question dans la bd
+      url: "/edit-form-question/" + $idBDQuestion,
+      success: function (data, textStatus, xhr) {
+        $(document).append(data);
+      },
+    })
+      .done(function (data) {
+        console.log("done");
+      })
+      .fail(function (error) {
+        console.log("error");
+        $($submittedForm).find("button[type='submit'] svg").remove();
+      });
+  });
 }
 
 $(document).ready(function () {
@@ -142,6 +190,13 @@ $(document).ready(function () {
   */
   $(document).on("click", "#addQuestion", function (e) {
     ajoutFormulaireQuestion();
+  });
+
+  /*
+  Listener sur le bouton "Modifier une question"
+  */
+  $(document).on("click", "#editQuestion", function (e) {
+    modifierFormulaireQuestion();
   });
 
   /*submit question*/
@@ -160,6 +215,19 @@ $(document).ready(function () {
     let $quizIdHolder = $(".js-quiz-id");
     let $quizId = $quizIdHolder.data("quizId");
 
+    //met l'attribut vraiFaux à faux pour les réponses fausses
+    $(".reponse")
+      .children()
+      .each(function (index) {
+        $(".reponse")
+          .children()
+          .find("#question_reponses_" + index + "_vraiFaux")
+          .val(0);
+      });
+
+    //met la première réponse à vrai
+    $(".reponse").children().find("#question_reponses_0_vraiFaux").val(1);
+
     //data du formulaire
     let $formData = $submittedForm.serialize();
 
@@ -167,31 +235,40 @@ $(document).ready(function () {
     $.ajax({
       type: "POST",
       data: $formData,
-      // url: Routing.generate("quiz_enregistrerQuestion"), //route qui va recup les data et enregistrer la question dans la bd
+      // route qui va recup les data et enregistrer la question dans la bd
+      // url: Routing.generate("quiz_enregistrerQuestion"),
       url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd,
       success: function (data, textStatus, xhr) {
-        //enleve l'icone de chargement
+        //enleve l'icone de chargement du submit de la question
         $($submittedForm).find("button[type='submit'] svg").remove();
 
         //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
+        //et on raffiche le form avec les erreurs
         if (xhr.status === 200) {
           let $formHolder = $submittedForm.parent();
           $submittedForm.remove(); //enleve le formulaire
-          $($formHolder).append(data); //on ajoute le nouveau formulaire avec erreurs au holder
+          $formHolder.append(data); //on ajoute le nouveau formulaire avec erreurs au holder
 
           //met dans le bon ordre des questions
           changeOrdreQuestion();
 
           //ajoute le bouton "Ajouter une reponse"
-          boutonAjoutReponses($($formHolder).attr("id"));
+          boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
         } else {
           //si on revoie un code 201, la requete a mené à la creation d'une ressource
           $($submittedForm).find("button[type='submit']").remove();
+          $($submittedForm).find("input, textarea").prop("disabled", true);
+          $($submittedForm).find("button[type='button']").remove();
+          $($submittedForm)
+            .find("> div")
+            .append(
+              '<button type="submit" class="btn btn-primary">Modifier la question</button>'
+            );
         }
       },
     })
       .done(function (data) {
-        console.log("done");
+        $idBDQuestion = data.idQuestion;
       })
       .fail(function (error) {
         console.log("error");
@@ -217,7 +294,7 @@ $(document).ready(function () {
   /*supprime le textarea reponse*/
   /*TODO penser aussi a verifier que le user a pas deja écrit une reponse avant de suppr, le prevenir*/
   $(document).on("click", ".delete", function (e) {
-    // $(this).parent().remove();
+    $(this).parent().remove();
     //
     // console.log($(this).parent().parent());
     // if ($(this).parent().children().length - 1 === 4) {

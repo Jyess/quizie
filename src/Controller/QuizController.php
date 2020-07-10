@@ -8,6 +8,7 @@ use App\Entity\Reponse;
 use App\Form\QuizType;
 use App\Form\QuestionType;
 use App\Form\ReponseType;
+use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,8 +71,8 @@ class QuizController extends AbstractController
      * @param $idQuiz
      * @return Response
      */
-    public function modifierQuiz($idQuiz, QuizRepository $repository) {
-        $quiz = $repository->find($idQuiz);
+    public function modifierQuiz($idQuiz, QuizRepository $quizRepository) {
+        $quiz = $quizRepository->find($idQuiz);
 
         $question = new Question();
         $questionForm = $this->createForm(QuestionType::class, $question);
@@ -95,6 +96,19 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @Route("/edit-form-question/{idQuestion}", name="quiz_genererFormEditQuestion")
+     */
+    public function genererFormEditQuestion($idQuestion, QuestionRepository $questionRepository) {
+        $question = $questionRepository->find($idQuestion);
+
+        $questionForm = $this->createForm(QuestionType::class, $question);
+
+        return $this->render('quiz/form_question.html.twig', [
+            'questionFormulaire' => $questionForm->createView()
+        ]);
+    }
+
+    /**
      * @Route("/save-question/{idQuiz}", name="quiz_enregistrerQuestion", options = { "expose" = true })
      * @param Request $request
      */
@@ -105,8 +119,6 @@ class QuizController extends AbstractController
 
             $questionForm->handleRequest($request);
 
-            dd($question);
-
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
                 $quiz = $repository->find($idQuiz);
                 $question->setQuiz($quiz);
@@ -115,7 +127,7 @@ class QuizController extends AbstractController
                 $entityMangager->persist($question);
                 $entityMangager->flush();
 
-                return new JsonResponse(['code' => 201], 201);
+                return new JsonResponse(['idQuestion' => $question->getId()], 201);
             }
 
             return $this->render('quiz/form_question.html.twig', [
