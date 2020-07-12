@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -110,7 +111,7 @@ class Question
         return $this;
     }
 
-    public function getReponses(): ?ArrayCollection
+    public function getReponses(): ?Collection
     {
         return $this->reponses;
     }
@@ -126,5 +127,10 @@ class Question
     public function removeReponse(Reponse $reponse)
     {
         $this->reponses->removeElement($reponse);
+    }
+
+    public function __toString()
+    {
+        return "blabla";
     }
 }

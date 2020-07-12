@@ -39,8 +39,9 @@ class QuizType extends AbstractType
                 'required' => false,
                 'widget' => 'single_text',
                 'attr' => [
-                    'min' => ( new \DateTime() )->format('d-m-Y H:i')
-                ]])
+                    'min' => (new \DateTime())->format('d-m-Y H:i')
+                ]
+            ])
             ->add('plageHoraireFin', DateTimeType::class, [
                 'required' => false,
                 'widget' => 'single_text',
@@ -48,8 +49,7 @@ class QuizType extends AbstractType
             ])
             ->add('envoyer', SubmitType::class, [
                 'label' => 'Je crée les questions'
-            ]);
-        ;
+            ]);;
     }
 
     public function configureOptions(OptionsResolver $resolver)

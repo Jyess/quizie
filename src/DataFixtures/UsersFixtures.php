@@ -5,9 +5,10 @@ namespace App\DataFixtures;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
-class AppFixtures extends Fixture
+class UsersFixtures extends Fixture
 {
-    public function load(\Doctrine\Persistence\ObjectManager $manager) {
+    public function load(\Doctrine\Persistence\ObjectManager $manager)
+    {
         $faker = \Faker\Factory::create('fr_FR');
 
         for ($i = 0; $i < 10; $i++) {
@@ -16,7 +17,7 @@ class AppFixtures extends Fixture
             $utilisateur->setNom($faker->lastName);
             $utilisateur->setPrenom($faker->firstName);
             $utilisateur->setEmail($faker->email);
-            $utilisateur->setPassword('$2a$10$kFgwsoGUUy5MvCNM2XSpJeKETe1XYStd.f1sxxI4pnGkJZYT.Ir3K'); //azerty
+            $utilisateur->setPassword(\password_hash('azerty', \PASSWORD_BCRYPT));
 
             $manager->persist($utilisateur);
         }

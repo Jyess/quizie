@@ -1,43 +1,45 @@
 {% block body %}
 
-		{# debut bloc question #}
-		{{ form_start(questionFormulaire) }}
+	{# debut bloc question #}
+	{{ form_start(questionFormulaire) }}
 
-		<div class="jumbotron mt-5 p-4">
+	<input class="js-question-id" type="hidden" name="js-question-id">
 
-			<div class="row">
-				<div class="col-2 text-center questionNum">1</div>
-				<div class="col my-auto">
-					{{ form_errors(questionFormulaire.intitule) }}
-					<div class="row align-middle">{{ form_widget(questionFormulaire.intitule, {'attr' : { 'class' : 'border-0 rounded w-100 mr-4 p-2', 'placeholder' : 'Entrez votre question ici'} }) }}</div>
-				</div>
+	<div class="jumbotron mt-5 p-4">
+
+		<div class="row">
+			<div class="col-2 text-center questionNum">1</div>
+			<div class="col my-auto">
+				{{ form_errors(questionFormulaire.intitule) }}
+				<div class="row align-middle">{{ form_widget(questionFormulaire.intitule, {'attr' : { 'class' : 'border-0 rounded w-100 mr-4 p-2', 'placeholder' : 'Entrez votre question ici'} }) }}</div>
 			</div>
-
-			<div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
-
-			<div class="col">
-				<div class="row my-2">
-					{{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points positif pour une bonne réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
-					<i id="js-random-point-1" class="random fas fa-random" title="Nombre aléatoire"></i>
-					{{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2'} }) }}
-					<span class="px-2 my-auto">points</span>
-{#					{{ form_help(questionFormulaire.nbPointsBonneReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
-					{{ form_errors(questionFormulaire.nbPointsBonneReponse) }}
-				</div>
-				<div class="row my-2">
-					{{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points négatif pour une mauvaise réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
-					<i id="js-random-point-2" class="random fas fa-random" title="Nombre aléatoire"></i>
-					{{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2'} }) }}
-					<span class="px-2 my-auto">points</span>
-{#					{{ form_help(questionFormulaire.nbPointsMauvaiseReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
-					{{ form_errors(questionFormulaire.nbPointsMauvaiseReponse) }}
-				</div>
-			</div>
-
-			{{ form_row(questionFormulaire.quiz) }}
-			{{ form_row(questionFormulaire.valider, {'attr' : { 'class' : 'btn btn-primary '} }) }}
-			{{ form_end(questionFormulaire) }}
 		</div>
-		{# fin bloc question #}
+
+		<div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
+
+		<div class="col">
+			<div class="row my-2">
+				{{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points positif pour une bonne réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
+				<i id="js-random-point-1" class="random fas fa-random" title="Nombre aléatoire"></i>
+				{{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2'} }) }}
+				<span class="px-2 my-auto">points</span>
+				{#					{{ form_help(questionFormulaire.nbPointsBonneReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
+				{{ form_errors(questionFormulaire.nbPointsBonneReponse) }}
+			</div>
+			<div class="row my-2">
+				{{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points négatif pour une mauvaise réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
+				<i id="js-random-point-2" class="random fas fa-random" title="Nombre aléatoire"></i>
+				{{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2'} }) }}
+				<span class="px-2 my-auto">points</span>
+				{#					{{ form_help(questionFormulaire.nbPointsMauvaiseReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
+				{{ form_errors(questionFormulaire.nbPointsMauvaiseReponse) }}
+			</div>
+		</div>
+
+		{{ form_row(questionFormulaire.quiz) }}
+		{{ form_row(questionFormulaire.valider, {'attr' : { 'class' : 'btn btn-primary '} }) }}
+		{{ form_end(questionFormulaire) }}
+	</div>
+	{# fin bloc question #}
 
 {% endblock %}

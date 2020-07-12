@@ -5,11 +5,6 @@ initialise une variable correspondant à l'id d'une question
  */
 let $idQuestion = 1;
 
-/*
-initialise une variable correspondant à l'id de la question dans la bd
- */
-let $idBDQuestion = 0;
-
 /**
  * Ajoute du texte dans le presse papier
  * @param text
@@ -52,13 +47,13 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
   //change les labels des réponses
   $(".reponse label").each(function (index) {
     $(this).html("Réponse fausse"); //d'abord tous réponse fausse
-    $(".reponses .reponse").first().find("label").html("Réponse juste"); //premier label de chaque question
+    $(".reponses .reponse:first-child label").html("Réponse juste"); //premier label de chaque question
   });
 }
 
 /**
  * Ajoute un bouton avec un listener au bon bloc question
- * @param idQuestion id de la question (#question1)
+ * @param idQuestion id de la question (ex: #question1)
  */
 function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
@@ -113,6 +108,7 @@ function ajoutFormulaireQuestion() {
 
   //requete ajax pour afficher le formulaire d'une question
   $.ajax({
+    type: "POST",
     url: "/form-question", //route qui genere la view
   })
     .done(function (view) {
@@ -143,40 +139,6 @@ function ajoutFormulaireQuestion() {
     });
 }
 
-/**
- * Permet de modifier un formulaire question
- */
-function modifierFormulaireQuestion() {
-  $("body").on("submit", "form", function (e) {
-    e.preventDefault();
-
-    //l'element fomrmulaire actuel
-    let $submittedForm = $(this);
-
-    //affiche une icone de chargement
-    $($submittedForm)
-      .find("button[type='submit']")
-      .append('<i class="ml-2 fas fa-circle-notch fa-spin">');
-
-    //envoie les data
-    $.ajax({
-      type: "GET",
-      // route qui va recup la question dans la bd
-      url: "/edit-form-question/" + $idBDQuestion,
-      success: function (data, textStatus, xhr) {
-        $(document).append(data);
-      },
-    })
-      .done(function (data) {
-        console.log("done");
-      })
-      .fail(function (error) {
-        console.log("error");
-        $($submittedForm).find("button[type='submit'] svg").remove();
-      });
-  });
-}
-
 $(document).ready(function () {
   /*
   Copie la clé d'accès dans le presse papier au clic du bouton "copier"
@@ -195,8 +157,38 @@ $(document).ready(function () {
   /*
   Listener sur le bouton "Modifier une question"
   */
-  $(document).on("click", "#editQuestion", function (e) {
-    modifierFormulaireQuestion();
+  $(document).on("click", ".editQuestion", function (e) {
+    let $buttonEditForm = $(this);
+    let $submittedForm = $buttonEditForm.closest("form");
+    let $idBDQuestion = $submittedForm.find(".js-question-id").val();
+
+    //affiche une icone de chargement
+    $($buttonEditForm).append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+
+    //envoie les data
+    $.ajax({
+      type: "POST",
+      // route qui va recup la question dans la bd
+      url: "/edit-form-question/" + $idBDQuestion,
+      success: function (data, textStatus, xhr) {
+        let $formHolder = $submittedForm.parent();
+        $submittedForm.remove(); //enleve le formulaire actuel
+        $formHolder.append(data); //ajoute au holder le formulaire
+
+        //met dans le bon ordre les questions
+        changeOrdreQuestion();
+
+        //ajoute le bouton "Ajouter une reponse"
+        boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
+      },
+    })
+      .done(function (data) {
+        console.log("done");
+      })
+      .fail(function (error) {
+        console.log("error");
+        $($buttonEditForm).find("svg").remove();
+      });
   });
 
   /*submit question*/
@@ -242,14 +234,17 @@ $(document).ready(function () {
         //enleve l'icone de chargement du submit de la question
         $($submittedForm).find("button[type='submit'] svg").remove();
 
+        //met l'id de la question dans un champ caché
+        $($submittedForm).find(".js-question-id").val(data.idQuestion);
+
         //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
         //et on raffiche le form avec les erreurs
         if (xhr.status === 200) {
           let $formHolder = $submittedForm.parent();
-          $submittedForm.remove(); //enleve le formulaire
-          $formHolder.append(data); //on ajoute le nouveau formulaire avec erreurs au holder
+          $submittedForm.remove(); //enleve le formulaire actuel
+          $formHolder.append(data); //ajoute au holder le nouveau formulaire avec les erreurs
 
-          //met dans le bon ordre des questions
+          //met dans le bon ordre les questions
           changeOrdreQuestion();
 
           //ajoute le bouton "Ajouter une reponse"
@@ -262,13 +257,15 @@ $(document).ready(function () {
           $($submittedForm)
             .find("> div")
             .append(
-              '<button type="submit" class="btn btn-primary">Modifier la question</button>'
+              '<button type="button" class="editQuestion btn btn-primary">Modifier la question</button>'
             );
         }
       },
     })
       .done(function (data) {
-        $idBDQuestion = data.idQuestion;
+        // let $quizIdHolder = $(".js-quiz-id");
+        // let $quizId = $quizIdHolder.data("quizId");
+        //faire div avec l'id question
       })
       .fail(function (error) {
         console.log("error");
