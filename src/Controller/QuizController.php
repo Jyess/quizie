@@ -72,19 +72,13 @@ class QuizController extends AbstractController
     public function modifierQuiz($idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
         $quiz = $quizRepository->find($idQuiz);
-        $questions = $questionRepository->findBy(["quiz" => $quiz]);
-
-        if ($questions) {
-
-        }
 
         $question = new Question();
         $questionForm = $this->createForm(QuestionType::class, $question);
 
         return $this->render('quiz/creer_questions.html.twig', [
             'quiz' => $quiz,
-            'questionFormulaire' => $questionForm->createView(),
-            'questions' => $questions
+            'questionFormulaire' => $questionForm->createView()
         ]);
     }
 
@@ -101,6 +95,22 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
+     */
+    public function recupererQuestionsDejaCreees($idQuiz, QuestionRepository $questionRepository, QuizRepository $quizRepository)
+    {
+        $quiz = $quizRepository->find($idQuiz);
+        $questions = $questionRepository->findBy(["quiz" => $quiz]);
+
+        $idsQuestions = [];
+        foreach ($questions as $question) {
+            $idsQuestions[] = $question->getId();
+        }
+
+        return new JsonResponse(['idsQuestions' => $idsQuestions], 201);
+    }
+
+    /**
      * @Route("/manage-question/{idQuiz}/{idQuestion}", name="quiz_manageQuestion", options = { "expose" = true }, defaults={"idQuestion"=null})
      */
     public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
@@ -108,8 +118,6 @@ class QuizController extends AbstractController
         if ($request->isMethod(Request::METHOD_POST)) {
             $uneQuestion = new Question();
             $quiz = $quizRepository->find($idQuiz);
-
-            $questionsDejaCreees = $questionRepository->findBy(["quiz" => $quiz]);
 
             if ($idQuestion) $uneQuestion = $questionRepository->find($idQuestion);
 
@@ -128,8 +136,7 @@ class QuizController extends AbstractController
 
             return $this->render('quiz/form_question.html.twig', [
                 'questionFormulaire' => $questionForm->createView(),
-                'question' => $uneQuestion,
-                'questionsDejaCreees' => $questionsDejaCreees
+                'question' => $uneQuestion
             ]);
         }
 

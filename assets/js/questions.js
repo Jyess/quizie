@@ -60,6 +60,9 @@ function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $boutonAjoutReponse = $(
     '<button type="button" class="btn btn-secondary">Ajouter une réponse</button>'
   );
+  let $boutonDeleteReponse = $(
+    '<button type="button" class="btn btn-secondary">Supprimer une réponse</button>'
+  );
   let $buttonContainer = $("<div></div>").append($boutonAjoutReponse);
 
   // Get the ul that holds the collection of tags
@@ -137,6 +140,57 @@ function ajoutFormulaireQuestion() {
     });
 }
 
+function afficherQuestionsDejaCreees($quizId) {
+  $.ajax({
+    type: "POST",
+    url: "/recuperer-questions/" + $quizId,
+    success: function (data, textStatus, xhr) {
+      if (data.idsQuestions.length > 0) {
+        $("body").append(
+          '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
+        );
+
+        $.each(data.idsQuestions, function (index, value) {
+          $.ajax({
+            type: "POST",
+            url: "/manage-question/" + $quizId + "/" + value,
+            success: function (data, textStatus, xhr) {
+              let $formHolder = $("<div class='form'></div>");
+              $("#questionsContainer").append($formHolder);
+              $formHolder.append(data);
+
+              changeOrdreQuestion();
+
+              //ajout de l'id du bloc question
+              $("#questionsContainer > div.form")
+                .last() //au dernier formulaire ajouté
+                .attr("id", "question" + $idQuestion);
+
+              //ajoute les formulaires des reponses
+              boutonAjoutReponsesEtFormulaires("#question" + $idQuestion);
+
+              // incrémente l'id de la question
+              $idQuestion++;
+
+              $formHolder.find("button.addQuestion").prop("disabled", true);
+              $formHolder.find("button.editQuestion").prop("disabled", false);
+              $formHolder.find("button.deleteQuestion").prop("disabled", false);
+              $formHolder.find("input, textarea").prop("disabled", true);
+              $formHolder.find(".reponses button").remove();
+              $formHolder.find(".random").remove();
+            },
+            complete: function () {
+              $(".loading").parent().remove();
+            },
+          });
+        });
+      } else {
+        $(".loading").parent().remove();
+      }
+    },
+  });
+}
+
 $(document).ready(function () {
   // Copie la clé d'accès dans le presse papier au clic du bouton "copier"
   $(document).on("click", ".fa-copy", function () {
@@ -152,12 +206,9 @@ $(document).ready(function () {
   let $quizIdHolder = $(".js-quiz-id");
   let $quizId = $quizIdHolder.data("quizId");
 
-  $.ajax({
-    type: "POST",
-    url: "manage-question/" + $quizId,
-  });
+  afficherQuestionsDejaCreees($quizId);
 
-  // submit question
+  // enregistrement d'une question dans la base de données
   $(document).on("submit", $(".addQuestion").closest("form"), function (e) {
     e.preventDefault();
 
@@ -227,6 +278,8 @@ $(document).ready(function () {
             .find("button.deleteQuestion")
             .prop("disabled", false);
           $($submittedForm).find("input, textarea").prop("disabled", true);
+          $($submittedForm).find(".reponses button").remove();
+          $submittedForm.find(".random").remove();
         }
       },
     })
