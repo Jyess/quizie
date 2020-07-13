@@ -118,10 +118,8 @@ class Question
 
     public function addReponse(Reponse $reponse)
     {
-        if (!$this->reponses->contains($reponse)) {
-            $reponse->setQuestion($this);
-            $this->reponses->add($reponse);
-        }
+        $this->reponses->add($reponse);
+        $reponse->setQuestion($this);
     }
 
     public function removeReponse(Reponse $reponse)

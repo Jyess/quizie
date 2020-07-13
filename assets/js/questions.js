@@ -33,7 +33,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 
   // Replace '__name__' in the prototype's HTML to
   // instead be a number based on how many items we have
-  formulaireReponse = formulaireReponse.replace(/__name__label__/g, index);
+  formulaireReponse = formulaireReponse.replace(/__name__/g, index);
 
   // increase the index with one for the next item
   $reponsesContainer.data("index", index + 1);
@@ -214,12 +214,17 @@ $(document).ready(function () {
     e.preventDefault();
 
     // met l'attribut vraiFaux à faux pour les réponses fausses
-    $(".reponse input[name='question[reponses][__name__][vraiFaux]']").val(0);
+    $(".reponse")
+      .children()
+      .each(function (index) {
+        $(".reponse")
+          .children()
+          .find("#question_reponses_" + index + "_vraiFaux")
+          .val(0);
+      });
 
     // met la première réponse à vrai
-    $(
-      ".reponse:first-child input[name='question[reponses][__name__][vraiFaux]']"
-    ).val(1);
+    $(".reponse").children().find("#question_reponses_0_vraiFaux").val(1);
 
     let $currentButton = $(document.activeElement);
 
@@ -238,8 +243,7 @@ $(document).ready(function () {
     }
 
     //data du formulaire
-    let $formData = $submittedForm.serializeArray();
-    console.log($formData);
+    let $formData = $submittedForm.serialize();
 
     // envoie les data
     $.ajax({
