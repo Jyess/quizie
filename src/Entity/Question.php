@@ -119,8 +119,8 @@ class Question
     public function addReponse(Reponse $reponse)
     {
         if (!$this->reponses->contains($reponse)) {
-            $this->reponses->add($reponse);
             $reponse->setQuestion($this);
+            $this->reponses->add($reponse);
         }
     }
 
@@ -131,6 +131,6 @@ class Question
 
     public function __toString()
     {
-        return "blabla";
+        return $this->getId() . " " . $this->getIntitule() . " " . $this->getNbPointsBonneReponse() . " " . $this->getNbPointsMauvaiseReponse();
     }
 }

@@ -33,7 +33,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 
   // Replace '__name__' in the prototype's HTML to
   // instead be a number based on how many items we have
-  formulaireReponse = formulaireReponse.replace(/__name__/g, index);
+  formulaireReponse = formulaireReponse.replace(/__name__label__/g, index);
 
   // increase the index with one for the next item
   $reponsesContainer.data("index", index + 1);
@@ -58,22 +58,23 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
   let $boutonAjoutReponse = $(
-    '<button type="button" class="btn btn-secondary">Ajouter une réponse</button>'
+    '<button type="button" class="btn btn-secondary mx-2">Ajouter une réponse</button>'
   );
   let $boutonDeleteReponse = $(
-    '<button type="button" class="btn btn-secondary">Supprimer une réponse</button>'
+    '<button type="button" class="btn btn-danger mx-2">Supprimer une réponse</button>'
   );
   let $buttonContainer = $("<div></div>").append($boutonAjoutReponse);
+  $buttonContainer.append($boutonDeleteReponse);
 
-  // Get the ul that holds the collection of tags
+  // container des reponses
   $reponsesContainer = $(idQuestion + " div.reponses");
 
-  // add the "add a tag" anchor and li to the tags ul
+  // ajoute les boutons au container
   $reponsesContainer.append($buttonContainer);
 
   // count the current form inputs we have (e.g. 2), use that as the new
   // index when inserting a new item (e.g. 2)
-  $reponsesContainer.data("index", $reponsesContainer.find("input").length);
+  $reponsesContainer.data("index", $reponsesContainer.find("textarea").length);
 
   $boutonAjoutReponse.on("click", function (e) {
     ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
@@ -212,6 +213,14 @@ $(document).ready(function () {
   $(document).on("submit", $(".addQuestion").closest("form"), function (e) {
     e.preventDefault();
 
+    // met l'attribut vraiFaux à faux pour les réponses fausses
+    $(".reponse input[name='question[reponses][__name__][vraiFaux]']").val(0);
+
+    // met la première réponse à vrai
+    $(
+      ".reponse:first-child input[name='question[reponses][__name__][vraiFaux]']"
+    ).val(1);
+
     let $currentButton = $(document.activeElement);
 
     // l'element fomrmulaire actuel
@@ -220,7 +229,7 @@ $(document).ready(function () {
     // affiche une icone de chargement
     $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
 
-    // id de la question si présent
+    // id de la question si présent (modification)
     let $idQuestion = $submittedForm.find(".js-question-id").val();
 
     let $url = "/manage-question/" + $quizId;
@@ -228,21 +237,9 @@ $(document).ready(function () {
       $url += "/" + $idQuestion;
     }
 
-    // met l'attribut vraiFaux à faux pour les réponses fausses
-    $(".reponse")
-      .children()
-      .each(function (index) {
-        $(".reponse")
-          .children()
-          .find("#question_reponses_" + index + "_vraiFaux")
-          .val(0);
-      });
-
-    // met la première réponse à vrai
-    $(".reponse").children().find("#question_reponses_0_vraiFaux").val(1);
-
     //data du formulaire
-    let $formData = $submittedForm.serialize();
+    let $formData = $submittedForm.serializeArray();
+    console.log($formData);
 
     // envoie les data
     $.ajax({

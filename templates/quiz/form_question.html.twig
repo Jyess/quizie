@@ -15,7 +15,7 @@
 		</div>
 
 		{% for reponse in questionFormulaire.reponses %}
-			{{ form_row(reponse) }}
+			{{ form_widget(reponse) }}
 		{% endfor %}
 
 		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
