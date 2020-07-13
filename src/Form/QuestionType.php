@@ -34,9 +34,9 @@ class QuestionType extends AbstractType
             ->add('reponses', CollectionType::class, [
                 'entry_type' => ReponseType::class,
                 'entry_options' => ['label' => false],
-                'allow_add' => true,
-//                'allow_delete' => true,
                 'by_reference' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
                 'label' => ' '
             ])
             ->add('quiz', HiddenType::class, [
@@ -44,8 +44,7 @@ class QuestionType extends AbstractType
             ])
             ->add('valider', SubmitType::class, [
                 'label' => 'Enregistrer la question'
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -112,7 +112,6 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/save-question/{idQuiz}", name="quiz_enregistrerQuestion", options = { "expose" = true })
-     * @param Request $request
      */
     public function enregistrerQuestion(Request $request, QuizRepository $repository, $idQuiz)
     {
@@ -121,8 +120,6 @@ class QuizController extends AbstractController
             $questionForm = $this->createForm(QuestionType::class, $question);
 
             $questionForm->handleRequest($request);
-
-            dump($question);
 
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
                 $quiz = $repository->find($idQuiz);
@@ -145,68 +142,30 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/edit-form-question/{idQuestion}", name="quiz_genererFormEditQuestion")
+     * @Route("/edit-question/{idQuestion}", name="quiz_modifierQuestion")
      */
-    public function genererFormEditQuestion($idQuestion, Request $request, QuestionRepository $questionRepository, EntityManagerInterface $entityManager)
+    public function modifierQuestion($idQuestion, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository)
     {
-        // if ($request->isMethod(Request::METHOD_POST)) {
-        //     $question = $questionRepository->find($idQuestion);
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $question = $questionRepository->find($idQuestion);
+            $questionForm = $this->createForm(QuestionType::class, $question);
 
-        //     $questionForm = $this->createForm(QuestionType::class, $question);
+            $questionForm->handleRequest($request);
 
-        //     return $this->render('quiz/form_question.html.twig', [
-        //         'questionFormulaire' => $questionForm->createView()
-        //     ]);
-        // }
+            if ($questionForm->isSubmitted() && $questionForm->isValid()) {
+                $entityMangager = $this->getDoctrine()->getManager();
+                $entityMangager->persist($question);
+                $entityMangager->flush();
 
-        if (!$request->isMethod(Request::METHOD_POST)) {
-            throw new AccessDeniedException();
-        }
-
-        $question = $entityManager->getRepository(Question::class)->find($idQuestion);
-        if ($question === null) {
-            throw $this->createNotFoundException('No question found for id ' . $idQuestion);
-        }
-
-        $originalReponses = new ArrayCollection();
-
-        // Create an ArrayCollection of the current Tag objects in the database
-        foreach ($question->getReponses() as $reponse) {
-            $originalReponses->add($reponse);
-        }
-
-        $editForm = $this->createForm(QuestionType::class, $question);
-
-        $editForm->handleRequest($request);
-
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            // remove the relationship between the tag and the Task
-            foreach ($originalReponses as $reponse) {
-                if (false === $question->getReponses()->contains($reponse)) {
-                    // remove the Task from the Tag
-                    // $reponse->getQuestions()->removeElement($reponse);
-
-                    // if it was a many-to-one relationship, remove the relationship like this
-                    $reponse->setQuestion(null);
-
-                    $entityManager->persist($reponse);
-
-                    // if you wanted to delete the Tag entirely, you can also do that
-                    // $entityManager->remove($tag);
-                }
+                return new JsonResponse(['code' => "201"], 201);
             }
 
-            $entityManager->persist($reponse);
-            $entityManager->flush();
-
-            // redirect back to some edit page
-            // return $this->redirectToRoute('task_edit', ['id' => $id]);
             return $this->render('quiz/form_question.html.twig', [
-                'questionFormulaire' => $editForm->createView()
+                'questionFormulaire' => $questionForm->createView()
             ]);
         }
-        return $this->render('quiz/form_question.html.twig', [
-            'questionFormulaire' => $editForm->createView()
-        ]);
+
+        // return new JsonResponse(['code' => 406], 406);
+        throw new AccessDeniedException();
     }
 }

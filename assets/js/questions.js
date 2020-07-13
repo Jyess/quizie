@@ -58,7 +58,7 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
   let $boutonAjoutReponse = $(
-    '<button type="button" class="btn btn-primary">Ajouter une réponse</button>'
+    '<button type="button" class="btn btn-secondary">Ajouter une réponse</button>'
   );
   let $buttonContainer = $("<div></div>").append($boutonAjoutReponse);
 
@@ -71,11 +71,6 @@ function boutonAjoutReponsesEtFormulaires(idQuestion) {
   // count the current form inputs we have (e.g. 2), use that as the new
   // index when inserting a new item (e.g. 2)
   $reponsesContainer.data("index", $reponsesContainer.find("input").length);
-
-  //affiche les deux réponses par défaut (juste/fausse)
-  for (let $i = 1; $i < 3; $i++) {
-    ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
-  }
 
   $boutonAjoutReponse.on("click", function (e) {
     ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
@@ -169,7 +164,7 @@ $(document).ready(function () {
     $.ajax({
       type: "POST",
       // route qui va recup la question dans la bd
-      url: "/edit-form-question/" + $idBDQuestion,
+      url: "/edit-question/" + $idBDQuestion,
       success: function (data, textStatus, xhr) {
         let $formHolder = $submittedForm.parent();
         $submittedForm.remove(); //enleve le formulaire actuel
@@ -251,14 +246,14 @@ $(document).ready(function () {
           boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
         } else {
           //si on revoie un code 201, la requete a mené à la creation d'une ressource
-          $($submittedForm).find("button[type='submit']").remove();
-          $($submittedForm).find("input, textarea").prop("disabled", true);
-          $($submittedForm).find("button[type='button']").remove();
-          $($submittedForm)
-            .find("> div")
-            .append(
-              '<button type="button" class="editQuestion btn btn-primary">Modifier la question</button>'
-            );
+          // $($submittedForm)
+          //   .find("button[type='submit']")
+          //   .prop("disabled", true);
+          // $($submittedForm).find("button.editQuestion").prop("disabled", false);
+          // $($submittedForm)
+          //   .find("button.deleteQuestion")
+          //   .prop("disabled", false);
+          // $($submittedForm).find("input, textarea").prop("disabled", true);
         }
       },
     })

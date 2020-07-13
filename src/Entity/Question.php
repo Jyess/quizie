@@ -49,7 +49,7 @@ class Question
 
     /**
      * @ORM\OneToMany(targetEntity=Reponse::class, mappedBy="question", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $reponses;
 

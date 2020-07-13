@@ -16,8 +16,7 @@ class ReponseType extends AbstractType
         $builder
             ->add('intitule', TextareaType::class)
             ->add('vraiFaux', HiddenType::class)
-            ->add('question', HiddenType::class)
-        ;
+            ->add('question', HiddenType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)

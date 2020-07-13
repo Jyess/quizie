@@ -15,7 +15,11 @@
 			</div>
 		</div>
 
-		<div class="reponses" data-prototype="{{ form_widget(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
+		{% for reponse in questionFormulaire.reponses %}
+			{{ form_row(reponse) }}
+		{% endfor %}
+
+		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
 
 		<div class="col">
 			<div class="row my-2">
@@ -23,7 +27,6 @@
 				<i id="js-random-point-1" class="random fas fa-random" title="Nombre aléatoire"></i>
 				{{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2'} }) }}
 				<span class="px-2 my-auto">points</span>
-				{#					{{ form_help(questionFormulaire.nbPointsBonneReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
 				{{ form_errors(questionFormulaire.nbPointsBonneReponse) }}
 			</div>
 			<div class="row my-2">
@@ -31,13 +34,15 @@
 				<i id="js-random-point-2" class="random fas fa-random" title="Nombre aléatoire"></i>
 				{{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2'} }) }}
 				<span class="px-2 my-auto">points</span>
-				{#					{{ form_help(questionFormulaire.nbPointsMauvaiseReponse, {'help_attr' : { 'class' : 'badge badge-secondary my-auto'}}) }}#}
 				{{ form_errors(questionFormulaire.nbPointsMauvaiseReponse) }}
 			</div>
 		</div>
 
-		{{ form_row(questionFormulaire.quiz) }}
-		{{ form_row(questionFormulaire.valider, {'attr' : { 'class' : 'btn btn-primary '} }) }}
+		<div class="row">
+			{{ form_widget(questionFormulaire.valider, {'attr' : { 'class' : 'btn btn-secondary col-lg m-2'} }) }}
+			<button type="button" class="editQuestion btn btn-secondary col-lg m-2">Modifier la question</button>
+			<button type="button" class="deleteQuestion btn btn-danger col-lg m-2">Supprimer la question</button>
+		</div>
 		{{ form_end(questionFormulaire) }}
 	</div>
 	{# fin bloc question #}
