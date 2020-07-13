@@ -101,10 +101,13 @@ function ajoutFormulaireQuestion() {
     '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
   );
 
+  let $quizIdHolder = $(".js-quiz-id");
+  let $quizId = $quizIdHolder.data("quizId");
+
   //requete ajax pour afficher le formulaire d'une question
   $.ajax({
     type: "POST",
-    url: "/form-question", //route qui genere la view
+    url: "/manage-question/" + $quizId, //route qui genere la view
   })
     .done(function (view) {
       $(".loading").parent().remove(); //on enlève l'icone de chargement
@@ -135,74 +138,46 @@ function ajoutFormulaireQuestion() {
 }
 
 $(document).ready(function () {
-  /*
-  Copie la clé d'accès dans le presse papier au clic du bouton "copier"
-  */
+  // Copie la clé d'accès dans le presse papier au clic du bouton "copier"
   $(document).on("click", ".fa-copy", function () {
     copyToClipboard($(".code").html());
   });
 
-  /*
-  Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
-  */
+  // Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
   $(document).on("click", "#addQuestion", function (e) {
     ajoutFormulaireQuestion();
   });
 
-  /*
-  Listener sur le bouton "Modifier une question"
-  */
-  $(document).on("click", ".editQuestion", function (e) {
-    let $buttonEditForm = $(this);
-    let $submittedForm = $buttonEditForm.closest("form");
-    let $idBDQuestion = $submittedForm.find(".js-question-id").val();
+  //id du quiz
+  let $quizIdHolder = $(".js-quiz-id");
+  let $quizId = $quizIdHolder.data("quizId");
 
-    //affiche une icone de chargement
-    $($buttonEditForm).append('<i class="ml-2 fas fa-circle-notch fa-spin">');
-
-    //envoie les data
-    $.ajax({
-      type: "POST",
-      // route qui va recup la question dans la bd
-      url: "/edit-question/" + $idBDQuestion,
-      success: function (data, textStatus, xhr) {
-        let $formHolder = $submittedForm.parent();
-        $submittedForm.remove(); //enleve le formulaire actuel
-        $formHolder.append(data); //ajoute au holder le formulaire
-
-        //met dans le bon ordre les questions
-        changeOrdreQuestion();
-
-        //ajoute le bouton "Ajouter une reponse"
-        boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
-      },
-    })
-      .done(function (data) {
-        console.log("done");
-      })
-      .fail(function (error) {
-        console.log("error");
-        $($buttonEditForm).find("svg").remove();
-      });
+  $.ajax({
+    type: "POST",
+    url: "manage-question/" + $quizId,
   });
 
-  /*submit question*/
-  $("body").on("submit", "form", function (e) {
+  // submit question
+  $(document).on("submit", $(".addQuestion").closest("form"), function (e) {
     e.preventDefault();
 
-    //l'element fomrmulaire actuel
-    let $submittedForm = $(this);
+    let $currentButton = $(document.activeElement);
 
-    //affiche une icone de chargement
-    $($submittedForm)
-      .find("button[type='submit']")
-      .append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+    // l'element fomrmulaire actuel
+    let $submittedForm = $currentButton.closest("form");
 
-    //recup l'id du quiz dans l'htlm
-    let $quizIdHolder = $(".js-quiz-id");
-    let $quizId = $quizIdHolder.data("quizId");
+    // affiche une icone de chargement
+    $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
 
-    //met l'attribut vraiFaux à faux pour les réponses fausses
+    // id de la question si présent
+    let $idQuestion = $submittedForm.find(".js-question-id").val();
+
+    let $url = "/manage-question/" + $quizId;
+    if ($idQuestion) {
+      $url += "/" + $idQuestion;
+    }
+
+    // met l'attribut vraiFaux à faux pour les réponses fausses
     $(".reponse")
       .children()
       .each(function (index) {
@@ -212,22 +187,22 @@ $(document).ready(function () {
           .val(0);
       });
 
-    //met la première réponse à vrai
+    // met la première réponse à vrai
     $(".reponse").children().find("#question_reponses_0_vraiFaux").val(1);
 
     //data du formulaire
     let $formData = $submittedForm.serialize();
 
-    //envoie les data
+    // envoie les data
     $.ajax({
       type: "POST",
       data: $formData,
       // route qui va recup les data et enregistrer la question dans la bd
       // url: Routing.generate("quiz_enregistrerQuestion"),
-      url: "/save-question/" + $quizId, //route qui va recup les data et enregistrer la question dans la bd,
+      url: $url, //route qui va recup les data et enregistrer la question dans la bd,
       success: function (data, textStatus, xhr) {
         //enleve l'icone de chargement du submit de la question
-        $($submittedForm).find("button[type='submit'] svg").remove();
+        $currentButton.find("svg").remove();
 
         //met l'id de la question dans un champ caché
         $($submittedForm).find(".js-question-id").val(data.idQuestion);
@@ -246,14 +221,12 @@ $(document).ready(function () {
           boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
         } else {
           //si on revoie un code 201, la requete a mené à la creation d'une ressource
-          // $($submittedForm)
-          //   .find("button[type='submit']")
-          //   .prop("disabled", true);
-          // $($submittedForm).find("button.editQuestion").prop("disabled", false);
-          // $($submittedForm)
-          //   .find("button.deleteQuestion")
-          //   .prop("disabled", false);
-          // $($submittedForm).find("input, textarea").prop("disabled", true);
+          $currentButton.prop("disabled", true);
+          $($submittedForm).find("button.editQuestion").prop("disabled", false);
+          $($submittedForm)
+            .find("button.deleteQuestion")
+            .prop("disabled", false);
+          $($submittedForm).find("input, textarea").prop("disabled", true);
         }
       },
     })

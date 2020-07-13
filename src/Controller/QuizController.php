@@ -10,6 +10,7 @@ use App\Form\QuestionType;
 use App\Form\ReponseType;
 use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
+use App\Repository\ReponseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
@@ -68,16 +69,22 @@ class QuizController extends AbstractController
      * @param $idQuiz
      * @return Response
      */
-    public function modifierQuiz($idQuiz, QuizRepository $quizRepository)
+    public function modifierQuiz($idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
         $quiz = $quizRepository->find($idQuiz);
+        $questions = $questionRepository->findBy(["quiz" => $quiz]);
+
+        if ($questions) {
+
+        }
 
         $question = new Question();
         $questionForm = $this->createForm(QuestionType::class, $question);
 
         return $this->render('quiz/creer_questions.html.twig', [
             'quiz' => $quiz,
-            'questionFormulaire' => $questionForm->createView()
+            'questionFormulaire' => $questionForm->createView(),
+            'questions' => $questions
         ]);
     }
 
@@ -94,74 +101,35 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/form-question", name="quiz_genererFormQuestion")
+     * @Route("/manage-question/{idQuiz}/{idQuestion}", name="quiz_manageQuestion", options = { "expose" = true }, defaults={"idQuestion"=null})
      */
-    public function genererFormQuestion(Request $request)
+    public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            $question = new Question();
-            $questionForm = $this->createForm(QuestionType::class, $question);
+            $uneQuestion = new Question();
+            $quiz = $quizRepository->find($idQuiz);
 
-            return $this->render('quiz/form_question.html.twig', [
-                'questionFormulaire' => $questionForm->createView()
-            ]);
-        }
+            $questionsDejaCreees = $questionRepository->findBy(["quiz" => $quiz]);
 
-        throw new AccessDeniedException();
-    }
+            if ($idQuestion) $uneQuestion = $questionRepository->find($idQuestion);
 
-    /**
-     * @Route("/save-question/{idQuiz}", name="quiz_enregistrerQuestion", options = { "expose" = true })
-     */
-    public function enregistrerQuestion(Request $request, QuizRepository $repository, $idQuiz)
-    {
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $question = new Question();
-            $questionForm = $this->createForm(QuestionType::class, $question);
-
+            $questionForm = $this->createForm(QuestionType::class, $uneQuestion);
             $questionForm->handleRequest($request);
 
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
-                $quiz = $repository->find($idQuiz);
-                $question->setQuiz($quiz);
+                $uneQuestion->setQuiz($quiz);
 
                 $entityMangager = $this->getDoctrine()->getManager();
-                $entityMangager->persist($question);
+                $entityMangager->persist($uneQuestion);
                 $entityMangager->flush();
 
-                return new JsonResponse(['idQuestion' => $question->getId()], 201);
+                return new JsonResponse(['idQuestion' => $uneQuestion->getId()], 201);
             }
 
             return $this->render('quiz/form_question.html.twig', [
-                'questionFormulaire' => $questionForm->createView()
-            ]);
-        }
-
-        // return new JsonResponse(['code' => 406], 406);
-        throw new AccessDeniedException();
-    }
-
-    /**
-     * @Route("/edit-question/{idQuestion}", name="quiz_modifierQuestion")
-     */
-    public function modifierQuestion($idQuestion, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository)
-    {
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $question = $questionRepository->find($idQuestion);
-            $questionForm = $this->createForm(QuestionType::class, $question);
-
-            $questionForm->handleRequest($request);
-
-            if ($questionForm->isSubmitted() && $questionForm->isValid()) {
-                $entityMangager = $this->getDoctrine()->getManager();
-                $entityMangager->persist($question);
-                $entityMangager->flush();
-
-                return new JsonResponse(['code' => "201"], 201);
-            }
-
-            return $this->render('quiz/form_question.html.twig', [
-                'questionFormulaire' => $questionForm->createView()
+                'questionFormulaire' => $questionForm->createView(),
+                'question' => $uneQuestion,
+                'questionsDejaCreees' => $questionsDejaCreees
             ]);
         }
 
