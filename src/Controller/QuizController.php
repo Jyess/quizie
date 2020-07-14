@@ -49,9 +49,9 @@ class QuizController extends AbstractController
             //set l'utilisateyur créateur du quiz
             $quiz->setUtilisateurCreateur($this->getUser());
 
-            $entityMangager = $this->getDoctrine()->getManager();
-            $entityMangager->persist($quiz);
-            $entityMangager->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($quiz);
+            $entityManager->flush();
 
             return $this->redirectToRoute("quiz_modifierQuiz", [
                 'idQuiz' => $quiz->getId()
@@ -124,12 +124,13 @@ class QuizController extends AbstractController
             $questionForm = $this->createForm(QuestionType::class, $uneQuestion);
             $questionForm->handleRequest($request);
 
+            $entityManager = $this->getDoctrine()->getManager();
+
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
                 $uneQuestion->setQuiz($quiz);
 
-                $entityMangager = $this->getDoctrine()->getManager();
-                $entityMangager->persist($uneQuestion);
-                $entityMangager->flush();
+                $entityManager->persist($uneQuestion);
+                $entityManager->flush();
 
                 return new JsonResponse(['idQuestion' => $uneQuestion->getId()], 201);
             }

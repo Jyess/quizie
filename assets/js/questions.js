@@ -84,6 +84,23 @@ function boutonAjoutReponsesEtFormulaires(idQuestion) {
   });
 }
 
+// function replaceSymfonyReponsePrototype($formHolder) {
+//   let $valueReponses = [];
+
+//   $formHolder
+//     .find(".reponseDejaCreees")
+//     .children()
+//     .each(function (index) {
+//       $valueReponses.push($(this).find("textarea").val());
+//       $(this).remove();
+//       ajoutFormulaireReponse($formHolder.find(".reponses"));
+//       $formHolder
+//         .find(".reponses textarea")
+//         .eq(index)
+//         .val($valueReponses[index]);
+//     });
+// }
+
 function changeOrdreQuestion() {
   // met le numéro de chaque question dans l'ordre
   // pour tous les formulaires de question créés
@@ -182,6 +199,7 @@ function afficherQuestionsDejaCreees($quizId) {
             },
             complete: function () {
               $(".loading").parent().remove();
+              // replaceSymfonyReponsePrototype($("#question" + $idQuestion));
             },
           });
         });
@@ -209,23 +227,11 @@ $(document).ready(function () {
 
   afficherQuestionsDejaCreees($quizId);
 
-  // enregistrement d'une question dans la base de données
-  $(document).on("submit", $(".addQuestion").closest("form"), function (e) {
+  // enregistrement ou modification d'une question dans la base de données
+  $(document).on("submit", "form", function (e) {
     e.preventDefault();
 
-    // met l'attribut vraiFaux à faux pour les réponses fausses
-    $(".reponse")
-      .children()
-      .each(function (index) {
-        $(".reponse")
-          .children()
-          .find("#question_reponses_" + index + "_vraiFaux")
-          .val(0);
-      });
-
-    // met la première réponse à vrai
-    $(".reponse").children().find("#question_reponses_0_vraiFaux").val(1);
-
+    let $questionHolder = $(e.target).parent();
     let $currentButton = $(document.activeElement);
 
     // l'element fomrmulaire actuel
@@ -282,6 +288,24 @@ $(document).ready(function () {
           $($submittedForm).find(".reponses button").remove();
           $submittedForm.find(".random").remove();
         }
+      },
+      complete: function () {
+        // met l'attribut vraiFaux à faux pour les réponses fausses
+        $questionHolder
+          .find(".reponseDejaCreees")
+          .children()
+          .each(function (index) {
+            $(this)
+              .find("#question_reponses_" + index + "_vraiFaux")
+              .val("0");
+          });
+
+        // met la première réponse à vrai
+        $questionHolder
+          .find(".reponseDejaCreees")
+          .children()
+          .find("#question_reponses_0_vraiFaux")
+          .val("1");
       },
     })
       .done(function (data) {

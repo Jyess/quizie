@@ -129,6 +129,6 @@ class Question
 
     public function __toString()
     {
-        return $this->getId() . " " . $this->getIntitule() . " " . $this->getNbPointsBonneReponse() . " " . $this->getNbPointsMauvaiseReponse();
+        return "";
     }
 }

@@ -14,9 +14,11 @@
 			</div>
 		</div>
 
-		{% for reponse in questionFormulaire.reponses %}
-			{{ form_widget(reponse) }}
-		{% endfor %}
+		<div class="reponseDejaCreees">
+			{% for reponse in questionFormulaire.reponses %}
+				{{ form_widget(reponse) }}
+			{% endfor %}
+		</div>
 
 		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
 
@@ -24,14 +26,14 @@
 			<div class="row my-2">
 				{{ form_label(questionFormulaire.nbPointsBonneReponse, 'Nombre de points positif pour une bonne réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
 				<i id="js-random-point-1" class="random fas fa-random" title="Nombre aléatoire"></i>
-				{{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2 col-1'} }) }}
+				{{ form_widget(questionFormulaire.nbPointsBonneReponse, {'attr' : { 'class' : 'ml-2 col-lg-1'} }) }}
 				<span class="px-2 my-auto">points</span>
 				{{ form_errors(questionFormulaire.nbPointsBonneReponse) }}
 			</div>
 			<div class="row my-2">
 				{{ form_label(questionFormulaire.nbPointsMauvaiseReponse, 'Nombre de points négatif pour une mauvaise réponse', { 'label_attr' : { 'class' : 'my-auto col-5' } }) }}
 				<i id="js-random-point-2" class="random fas fa-random" title="Nombre aléatoire"></i>
-				{{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2 col-1'} }) }}
+				{{ form_widget(questionFormulaire.nbPointsMauvaiseReponse, {'attr' : { 'class' : 'ml-2 col-lg-1'} }) }}
 				<span class="px-2 my-auto">points</span>
 				{{ form_errors(questionFormulaire.nbPointsMauvaiseReponse) }}
 			</div>
