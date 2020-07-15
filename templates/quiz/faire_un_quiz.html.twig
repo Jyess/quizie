@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un quiz
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1 class="title text-center">{{ leQuiz.intitule }}</h1>
+		<div class="text-center text-black-50">Créé par
+			<cite title="Source Title">{{ leQuiz.utilisateurCreateur.prenom ~ ' ' ~leQuiz.utilisateurCreateur.nom }}</cite>
+		</div>
+
+		<div class="mt-4">
+			<h2>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nemo temporibus tempore, perspiciatis ?</h2>
+
+			<div>
+				<div class="custom-control custom-radio py-2">
+					<input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+					<label class="custom-control-label" for="customRadio1">Toggle this custom radio</label>
+				</div>
+				<div class="custom-control custom-radio py-2">
+					<input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+					<label class="custom-control-label" for="customRadio2">Or toggle this other custom radio</label>
+				</div>
+				<div class="custom-control custom-radio py-2">
+					<input type="radio" id="customRadio3" name="customRadio" class="custom-control-input">
+					<label class="custom-control-label" for="customRadio3">Or toggle this other custom radio</label>
+				</div>
+				<div class="custom-control custom-radio py-2">
+					<input type="radio" id="customRadio4" name="customRadio" class="custom-control-input">
+					<label class="custom-control-label" for="customRadio4">Or toggle this other custom radio</label>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('quiz_js') }}
+{% endblock %}

@@ -9,8 +9,9 @@
 
 		<ul class="list-group list-group-flush">
 			{% for quiz in lesQuiz %}
-{#				{{ path('quiz_faireQuiz') }}#}
-				<li class="list-group-item"><a href="#">{{ quiz.intitule }}</a></li>
+				<li class="list-group-item">
+					<a href="{{ path('quiz_faireUnQuiz', {'idQuiz' : quiz.id}) }}">{{ quiz.intitule }}</a>
+				</li>
 			{% endfor %}
 		</ul>
 	</div>

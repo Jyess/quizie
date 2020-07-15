@@ -113,6 +113,21 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @Route("/quiz/{idQuiz}", name="quiz_faireUnQuiz")
+     */
+    public function faireUnQuiz($idQuiz, QuizRepository $quizRepository, ReponseRepository $reponseRepository)
+    {
+        $leQuiz = $quizRepository->find($idQuiz);
+
+        // dd($reponseRepository->findQuestionsWithAnswers($idQuiz));
+        dd($quizRepository->findQuestionsWithAnswers($idQuiz));
+
+        return $this->render('quiz/faire_un_quiz.html.twig', [
+            'leQuiz' => $leQuiz
+        ]);
+    }
+
+    /**
      * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
      */
     public function recupererQuestionsDejaCreees($idQuiz, QuestionRepository $questionRepository, QuizRepository $quizRepository)

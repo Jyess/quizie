@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Reponse;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,21 +21,18 @@ class ReponseRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Reponse[] Returns an array of Reponse objects
+    //  * @return Quiz[] Returns an array of Quiz objects
     //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    // public function findQuestionsWithAnswers($idQuiz)
+    // {
+    //     return $this->createQueryBuilder('reponse')
+    //         ->join('reponse.question', 'question')
+    //         ->join('question.quiz', 'quiz')
+    //         ->andWhere('quiz.id = :idQuiz')
+    //         ->setParameter('idQuiz', $idQuiz)
+    //         ->getQuery()
+    //         ->getResult();
+    // }
 
     /*
     public function findOneBySomeField($value): ?Reponse
