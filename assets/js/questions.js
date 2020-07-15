@@ -17,6 +17,14 @@ function copyToClipboard(text) {
   $temp.remove(); //supprime l'input
 }
 
+function labelsRightWrong($formHolder) {
+  $formHolder.find(".reponses label").each(function () {
+    $(this).html("Réponse fausse"); //d'abord tous réponse fausse
+  });
+
+  $formHolder.find(".reponses label").first().html("Réponse juste"); //premier label de chaque question
+}
+
 /**
  * Génère le formulaire de réponse
  * @param $reponsesContainer
@@ -45,10 +53,30 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
   $buttonContainer.before($nouveauFormulaire);
 
   //change les labels des réponses
-  $(".reponse label").each(function (index) {
-    $(this).html("Réponse fausse"); //d'abord tous réponse fausse
-    $(".reponses .reponse:first-child label").html("Réponse juste"); //premier label de chaque question
-  });
+  let $formHolder = $reponsesContainer.closest("form").parent();
+  labelsRightWrong($formHolder);
+  vraiFauxValues($formHolder);
+}
+
+function addDeleteReponse(
+  nbReponses,
+  $boutonAjoutReponse,
+  $boutonDeleteReponse
+) {
+  console.log(nbReponses);
+  if (nbReponses === 0) {
+    //ajouter
+    $boutonAjoutReponse.show();
+    $boutonDeleteReponse.hide();
+  } else if (nbReponses > 0 && nbReponses < 4) {
+    //ajouter et suppr
+    $boutonAjoutReponse.show();
+    $boutonDeleteReponse.show();
+  } else {
+    //suppr
+    $boutonAjoutReponse.hide();
+    $boutonDeleteReponse.show();
+  }
 }
 
 /**
@@ -58,12 +86,14 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
 function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
   let $boutonAjoutReponse = $(
-    '<button type="button" class="btn btn-secondary mx-2">Ajouter une réponse</button>'
+    '<button type="button" class="col-lg btn btn-secondary mx-2 addReponse">Ajouter une réponse</button>'
   );
   let $boutonDeleteReponse = $(
-    '<button type="button" class="btn btn-danger mx-2">Supprimer une réponse</button>'
+    '<button type="button" class="col-lg btn btn-danger mx-2 deleteReponse">Supprimer une réponse</button>'
   );
-  let $buttonContainer = $("<div></div>").append($boutonAjoutReponse);
+  let $buttonContainer = $("<div class='row'></div>").append(
+    $boutonAjoutReponse
+  );
   $buttonContainer.append($boutonDeleteReponse);
 
   // container des reponses
@@ -76,30 +106,27 @@ function boutonAjoutReponsesEtFormulaires(idQuestion) {
   // index when inserting a new item (e.g. 2)
   $reponsesContainer.data("index", $reponsesContainer.find("textarea").length);
 
+  let nbReponses = $(idQuestion).find(".reponses").children().length - 1;
+  addDeleteReponse(nbReponses, $boutonAjoutReponse, $boutonDeleteReponse);
+
   $boutonAjoutReponse.on("click", function (e) {
-    ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
-    if ($(idQuestion + " .reponses").children().length - 1 >= 4) {
-      $(this).remove();
+    if ($(idQuestion).find(".mandatoryReponses")) {
+      $(idQuestion).find(".mandatoryReponses").remove();
     }
+
+    ajoutFormulaireReponse($reponsesContainer, $buttonContainer);
+    nbReponses = $(idQuestion).find(".reponses").children().length - 1;
+    addDeleteReponse(nbReponses, $boutonAjoutReponse, $boutonDeleteReponse);
+    vraiFauxValues($reponsesContainer);
+  });
+
+  $boutonDeleteReponse.on("click", function (e) {
+    $(this).parent().prev().remove();
+    nbReponses = $(idQuestion).find(".reponses").children().length - 1;
+    addDeleteReponse(nbReponses, $boutonAjoutReponse, $boutonDeleteReponse);
+    vraiFauxValues($reponsesContainer);
   });
 }
-
-// function replaceSymfonyReponsePrototype($formHolder) {
-//   let $valueReponses = [];
-
-//   $formHolder
-//     .find(".reponseDejaCreees")
-//     .children()
-//     .each(function (index) {
-//       $valueReponses.push($(this).find("textarea").val());
-//       $(this).remove();
-//       ajoutFormulaireReponse($formHolder.find(".reponses"));
-//       $formHolder
-//         .find(".reponses textarea")
-//         .eq(index)
-//         .val($valueReponses[index]);
-//     });
-// }
 
 function changeOrdreQuestion() {
   // met le numéro de chaque question dans l'ordre
@@ -116,11 +143,6 @@ function changeOrdreQuestion() {
 function ajoutFormulaireQuestion() {
   //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
   // $("#addQuestion").parent().remove();
-
-  //ajoute une icone de chargement
-  $("body").append(
-    '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
-  );
 
   let $quizIdHolder = $(".js-quiz-id");
   let $quizId = $quizIdHolder.data("quizId");
@@ -164,10 +186,6 @@ function afficherQuestionsDejaCreees($quizId) {
     url: "/recuperer-questions/" + $quizId,
     success: function (data, textStatus, xhr) {
       if (data.idsQuestions.length > 0) {
-        $("body").append(
-          '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
-        );
-
         $.each(data.idsQuestions, function (index, value) {
           $.ajax({
             type: "POST",
@@ -187,10 +205,7 @@ function afficherQuestionsDejaCreees($quizId) {
               //ajoute les formulaires des reponses
               boutonAjoutReponsesEtFormulaires("#question" + $idQuestion);
 
-              // incrémente l'id de la question
-              $idQuestion++;
-
-              $formHolder.find("button.addQuestion").prop("disabled", true);
+              $formHolder.find("button.saveQuestion").prop("disabled", true);
               $formHolder.find("button.editQuestion").prop("disabled", false);
               $formHolder.find("button.deleteQuestion").prop("disabled", false);
               $formHolder.find("input, textarea").prop("disabled", true);
@@ -199,15 +214,39 @@ function afficherQuestionsDejaCreees($quizId) {
             },
             complete: function () {
               $(".loading").parent().remove();
-              // replaceSymfonyReponsePrototype($("#question" + $idQuestion));
+              labelsRightWrong($("#question" + $idQuestion));
+              $("#addQuestion").show();
+
+              // incrémente l'id de la question
+              $idQuestion++;
             },
           });
         });
       } else {
         $(".loading").parent().remove();
+        $("#addQuestion").show();
       }
     },
   });
+}
+
+function vraiFauxValues($questionHolder) {
+  // met l'attribut vraiFaux à faux pour les réponses fausses
+  $questionHolder
+    .find(".reponses")
+    .children()
+    .each(function (index) {
+      $(this)
+        .find("#question_reponses_" + index + "_vraiFaux")
+        .val("0");
+    });
+
+  // met la première réponse à vrai
+  $questionHolder
+    .find(".reponses")
+    .children()
+    .find("#question_reponses_0_vraiFaux")
+    .val("1");
 }
 
 $(document).ready(function () {
@@ -224,6 +263,11 @@ $(document).ready(function () {
   //id du quiz
   let $quizIdHolder = $(".js-quiz-id");
   let $quizId = $quizIdHolder.data("quizId");
+
+  //ajoute une icone de chargement
+  $("body").append(
+    '<div class="col text-center"><i class="loading fas fa-circle-notch fa-spin"></i></div>'
+  );
 
   afficherQuestionsDejaCreees($quizId);
 
@@ -251,72 +295,103 @@ $(document).ready(function () {
     //data du formulaire
     let $formData = $submittedForm.serialize();
 
-    // envoie les data
+    if ($submittedForm.find(".reponses").children().length >= 3) {
+      // envoie les data
+      $.ajax({
+        type: "POST",
+        data: $formData,
+        // route qui va recup les data et enregistrer la question dans la bd
+        // url: Routing.generate("quiz_enregistrerQuestion"),
+        url: $url, //route qui va recup les data et enregistrer la question dans la bd,
+        success: function (data, textStatus, xhr) {
+          //enleve l'icone de chargement du submit de la question
+          $currentButton.find("svg").remove();
+
+          //met l'id de la question dans un champ caché
+          $($submittedForm).find(".js-question-id").val(data.idQuestion);
+
+          //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
+          //et on raffiche le form avec les erreurs
+          if (xhr.status === 200) {
+            let $formHolder = $submittedForm.parent();
+            $submittedForm.remove(); //enleve le formulaire actuel
+            $formHolder.append(data); //ajoute au holder le nouveau formulaire avec les erreurs
+
+            //met dans le bon ordre les questions
+            changeOrdreQuestion();
+
+            //ajoute le bouton "Ajouter une reponse"
+            boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
+          } else {
+            //si on revoie un code 201, la requete a mené à la creation d'une ressource
+            $currentButton.prop("disabled", true);
+            $($submittedForm)
+              .find("button.editQuestion")
+              .prop("disabled", false);
+            $($submittedForm)
+              .find("button.deleteQuestion")
+              .prop("disabled", false);
+            $($submittedForm).find("input, textarea").prop("disabled", true);
+            $($submittedForm).find(".reponses button").remove();
+            $submittedForm.find(".random").remove();
+          }
+        },
+        complete: function () {
+          vraiFauxValues($questionHolder);
+          labelsRightWrong($questionHolder);
+        },
+      })
+        .done(function (data) {
+          // let $quizIdHolder = $(".js-quiz-id");
+          // let $quizId = $quizIdHolder.data("quizId");
+          //faire div avec l'id question
+        })
+        .fail(function (error) {
+          console.log("error");
+          $($submittedForm).find("button[type='submit'] svg").remove();
+        });
+    } else {
+      $currentButton.find("i").remove(); //i car pas encore svg (pas eu le temps i guess)
+
+      if ($submittedForm.find(".mandatoryReponses")) {
+        $submittedForm.find(".mandatoryReponses").remove();
+      }
+
+      $submittedForm
+        .find(".reponses")
+        .prepend(
+          '<div class="mandatoryReponses alert alert-danger" role="alert">Deux réponses sont obligatoires.</div>'
+        )
+        .show();
+    }
+  });
+
+  // suppression d'une question dans la base de données
+  $(document).on("click", ".deleteQuestion", function (e) {
+    let $formHolder = $(this).closest(".form");
+    let $currentButton = $(this);
+
+    // affiche une icone de chargement
+    $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+
+    //id du quiz
+    let $quizIdHolder = $(".js-quiz-id");
+    let $idQuiz = $quizIdHolder.data("quizId");
+
+    // id de la question
+    let $idQuestion = $formHolder.find(".js-question-id").val();
+
     $.ajax({
-      type: "POST",
-      data: $formData,
       // route qui va recup les data et enregistrer la question dans la bd
       // url: Routing.generate("quiz_enregistrerQuestion"),
-      url: $url, //route qui va recup les data et enregistrer la question dans la bd,
+      url: "/delete-question/" + $idQuiz + "/" + $idQuestion, //route qui va recup les data et enregistrer la question dans la bd,
       success: function (data, textStatus, xhr) {
-        //enleve l'icone de chargement du submit de la question
-        $currentButton.find("svg").remove();
-
-        //met l'id de la question dans un champ caché
-        $($submittedForm).find(".js-question-id").val(data.idQuestion);
-
-        //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
-        //et on raffiche le form avec les erreurs
-        if (xhr.status === 200) {
-          let $formHolder = $submittedForm.parent();
-          $submittedForm.remove(); //enleve le formulaire actuel
-          $formHolder.append(data); //ajoute au holder le nouveau formulaire avec les erreurs
-
-          //met dans le bon ordre les questions
-          changeOrdreQuestion();
-
-          //ajoute le bouton "Ajouter une reponse"
-          boutonAjoutReponsesEtFormulaires("#" + $($formHolder).attr("id"));
-        } else {
-          //si on revoie un code 201, la requete a mené à la creation d'une ressource
-          $currentButton.prop("disabled", true);
-          $($submittedForm).find("button.editQuestion").prop("disabled", false);
-          $($submittedForm)
-            .find("button.deleteQuestion")
-            .prop("disabled", false);
-          $($submittedForm).find("input, textarea").prop("disabled", true);
-          $($submittedForm).find(".reponses button").remove();
-          $submittedForm.find(".random").remove();
-        }
+        $formHolder.remove();
       },
-      complete: function () {
-        // met l'attribut vraiFaux à faux pour les réponses fausses
-        $questionHolder
-          .find(".reponseDejaCreees")
-          .children()
-          .each(function (index) {
-            $(this)
-              .find("#question_reponses_" + index + "_vraiFaux")
-              .val("0");
-          });
-
-        // met la première réponse à vrai
-        $questionHolder
-          .find(".reponseDejaCreees")
-          .children()
-          .find("#question_reponses_0_vraiFaux")
-          .val("1");
-      },
-    })
-      .done(function (data) {
-        // let $quizIdHolder = $(".js-quiz-id");
-        // let $quizId = $quizIdHolder.data("quizId");
-        //faire div avec l'id question
-      })
-      .fail(function (error) {
-        console.log("error");
-        $($submittedForm).find("button[type='submit'] svg").remove();
-      });
+    }).fail(function () {
+      console.log("error");
+      $($formHolder).find("button[type='button'] svg").remove();
+    });
   });
 
   /* nb points aleatoire bonne reponse */
@@ -331,19 +406,6 @@ $(document).ready(function () {
     $(this)
       .siblings("input")
       .val(Math.floor(Math.random() * -20));
-  });
-
-  //TODO
-  /*supprime le textarea reponse*/
-  /*TODO penser aussi a verifier que le user a pas deja écrit une reponse avant de suppr, le prevenir*/
-  $(document).on("click", ".delete", function (e) {
-    $(this).parent().remove();
-    //
-    // console.log($(this).parent().parent());
-    // if ($(this).parent().children().length - 1 === 4) {
-    //   console.log("ok");
-    //   boutonAjoutReponses($(this).closest("div.form").attr("id"));
-    // }
   });
 
   // $(window).on("beforeunload", function () {

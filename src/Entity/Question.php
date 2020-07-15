@@ -48,7 +48,7 @@ class Question
     private $quiz;
 
     /**
-     * @ORM\OneToMany(targetEntity=Reponse::class, mappedBy="question", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Reponse::class, mappedBy="question", cascade={"persist","remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $reponses;

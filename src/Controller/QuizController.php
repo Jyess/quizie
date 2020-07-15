@@ -71,15 +71,22 @@ class QuizController extends AbstractController
      */
     public function modifierQuiz($idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
-        $quiz = $quizRepository->find($idQuiz);
+        $user = $this->getUser();
+        $isQuizOwner = $quizRepository->findOneBy(["id" => $idQuiz, "utilisateurCreateur" => $user->getId()]);
 
-        $question = new Question();
-        $questionForm = $this->createForm(QuestionType::class, $question);
+        if ($isQuizOwner) {
+            $quiz = $quizRepository->find($idQuiz);
 
-        return $this->render('quiz/creer_questions.html.twig', [
-            'quiz' => $quiz,
-            'questionFormulaire' => $questionForm->createView()
-        ]);
+            $question = new Question();
+            $questionForm = $this->createForm(QuestionType::class, $question);
+
+            return $this->render('quiz/creer_questions.html.twig', [
+                'quiz' => $quiz,
+                'questionFormulaire' => $questionForm->createView()
+            ]);
+        }
+
+        throw new AccessDeniedException();
     }
 
     /**
@@ -115,11 +122,23 @@ class QuizController extends AbstractController
      */
     public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
-        if ($request->isMethod(Request::METHOD_POST)) {
+        $user = $this->getUser();
+        $isQuizOwner = $quizRepository->findOneBy(["id" => $idQuiz, "utilisateurCreateur" => $user->getId()]);
+
+        if ($request->isMethod(Request::METHOD_POST) && $isQuizOwner) {
+            //reponses de la question dans la bdd
+            $reponsesBD = new ArrayCollection();
+
             $uneQuestion = new Question();
             $quiz = $quizRepository->find($idQuiz);
 
-            if ($idQuestion) $uneQuestion = $questionRepository->find($idQuestion);
+            if ($idQuestion) {
+                $uneQuestion = $questionRepository->find($idQuestion);
+
+                foreach ($uneQuestion->getReponses() as $reponse) {
+                    $reponsesBD->add($reponse);
+                }
+            }
 
             $questionForm = $this->createForm(QuestionType::class, $uneQuestion);
             $questionForm->handleRequest($request);
@@ -128,6 +147,15 @@ class QuizController extends AbstractController
 
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
                 $uneQuestion->setQuiz($quiz);
+
+                foreach ($reponsesBD as $reponse) {
+                    $reponse->setQuestion($uneQuestion);
+                    if (!$uneQuestion->getReponses()->contains($reponse)) {
+                        $reponse->setQuestion(null);
+                        $uneQuestion->removeReponse($reponse);
+                        $entityManager->persist($reponse);
+                    }
+                }
 
                 $entityManager->persist($uneQuestion);
                 $entityManager->flush();
@@ -139,6 +167,28 @@ class QuizController extends AbstractController
                 'questionFormulaire' => $questionForm->createView(),
                 'question' => $uneQuestion
             ]);
+        }
+
+        // return new JsonResponse(['code' => 406], 406);
+        throw new AccessDeniedException();
+    }
+
+    /**
+     * @Route("/delete-question/{idQuiz}/{idQuestion}", name="quiz_deleteQuestion")
+     */
+    public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
+    {
+        $user = $this->getUser();
+        $isQuizOwner = $quizRepository->findOneBy(["id" => $idQuiz, "utilisateurCreateur" => $user->getId()]);
+
+        if ($request->isMethod(Request::METHOD_GET) && $isQuizOwner) {
+            $question = $questionRepository->find($idQuestion);
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($question);
+            $entityManager->flush();
+
+            return new JsonResponse(['code' => '200'], 200);
         }
 
         // return new JsonResponse(['code' => 406], 406);

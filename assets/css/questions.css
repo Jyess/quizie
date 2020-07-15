@@ -126,10 +126,14 @@ input[type="number"] {
 
 /*couleur des bonnes reponses*/
 
-.reponses .reponse:first-child textarea {
+.reponses > div:first-child textarea {
   background-color: rgba(130, 215, 94, 0.2) !important;
 }
 
 button:disabled {
   cursor: not-allowed;
+}
+
+#addQuestion {
+  display: none;
 }

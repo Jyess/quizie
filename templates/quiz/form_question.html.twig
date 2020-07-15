@@ -14,13 +14,11 @@
 			</div>
 		</div>
 
-		<div class="reponseDejaCreees">
+		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}">
 			{% for reponse in questionFormulaire.reponses %}
 				{{ form_widget(reponse) }}
 			{% endfor %}
 		</div>
-
-		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}"></div>
 
 		<div class="col">
 			<div class="row my-2">
@@ -40,8 +38,8 @@
 		</div>
 
 		<div class="row">
-			{{ form_widget(questionFormulaire.valider, {'attr' : { 'class' : 'addQuestion btn btn-secondary col-lg m-2'} }) }}
-			<button type="submit" class="addQuestion editQuestion btn btn-secondary col-lg m-2" disabled>Modifier la question</button>
+			{{ form_widget(questionFormulaire.valider, {'attr' : { 'class' : 'saveQuestion btn btn-secondary col-lg m-2'} }) }}
+			<button type="submit" class="saveQuestion editQuestion btn btn-secondary col-lg m-2" disabled>Modifier la question</button>
 			<button type="button" class="deleteQuestion btn btn-danger col-lg m-2" disabled>Supprimer la question</button>
 		</div>
 		{{ form_end(questionFormulaire) }}
