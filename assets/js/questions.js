@@ -85,10 +85,10 @@ function addDeleteReponse(
 function boutonAjoutReponsesEtFormulaires(idQuestion) {
   let $reponsesContainer;
   let $boutonAjoutReponse = $(
-    '<button type="button" class="col-lg btn btn-secondary mx-2 addReponse">Ajouter une réponse</button>'
+    '<button type="button" class="col-lg btn btn-secondary mx-2 my-lg-0 my-2 addReponse">Ajouter une réponse</button>'
   );
   let $boutonDeleteReponse = $(
-    '<button type="button" class="col-lg btn btn-danger mx-2 deleteReponse">Supprimer une réponse</button>'
+    '<button type="button" class="col-lg btn btn-danger mx-2 my-lg-0 my-2 deleteReponse">Supprimer une réponse</button>'
   );
   let $buttonContainer = $("<div class='row'></div>").append(
     $boutonAjoutReponse
@@ -294,8 +294,7 @@ $(document).ready(function () {
     }
 
     //data du formulaire
-    let $formData = $submittedForm.serializeArray();
-    console.log($formData);
+    let $formData = $submittedForm.serialize();
 
     if ($submittedForm.find(".reponses").children().length >= 3) {
       // envoie les data

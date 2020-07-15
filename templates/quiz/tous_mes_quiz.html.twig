@@ -7,7 +7,7 @@
 	<div class="container">
 		<h1 class="title text-center mb-4">Tous mes quiz créés</h1>
 
-		<div class="list-group">
+		<div class="list-group text-break">
 			{% for unQuiz in mesQuiz %}
 				<a href="{{ path("quiz_modifierQuiz", { 'idQuiz' : unQuiz.id }) }}" class="list-group-item list-group-item-action">
 					{{ unQuiz.intitule }}

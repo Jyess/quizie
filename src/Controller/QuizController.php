@@ -102,6 +102,17 @@ class QuizController extends AbstractController
     }
 
     /**
+     * @Route("/quiz", name="quiz_tousLesQuiz")
+     */
+    public function tousLesQuiz(QuizRepository $quizRepository)
+    {
+        $lesQuiz = $quizRepository->findAll();
+        return $this->render('quiz/tous_les_quiz.html.twig', [
+            'lesQuiz' => $lesQuiz
+        ]);
+    }
+
+    /**
      * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
      */
     public function recupererQuestionsDejaCreees($idQuiz, QuestionRepository $questionRepository, QuizRepository $quizRepository)

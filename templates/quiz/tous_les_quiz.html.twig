@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un quiz
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1 class="title text-center">Les quiz disponibles</h1>
+
+		<ul class="list-group list-group-flush">
+			{% for quiz in lesQuiz %}
+{#				{{ path('quiz_faireQuiz') }}#}
+				<li class="list-group-item"><a href="#">{{ quiz.intitule }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('quiz_js') }}
+{% endblock %}

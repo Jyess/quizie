@@ -18,7 +18,9 @@ class QuestionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('intitule', TextareaType::class)
+            ->add('intitule', TextareaType::class, [
+                'label' => 'Votre question'
+            ])
             ->add('nbPointsBonneReponse', IntegerType::class, [
                 'help' => "(doit être positif)",
                 'attr' => [

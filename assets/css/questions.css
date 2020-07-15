@@ -130,10 +130,12 @@ input[type="number"] {
   background-color: rgba(130, 215, 94, 0.2) !important;
 }
 
+/*change le curseur pour les boutons desactives*/
 button:disabled {
   cursor: not-allowed;
 }
 
+/*bouton pour ajouter le formulaire d'ajout de question*/
 #addQuestion {
   display: none;
 }

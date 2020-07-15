@@ -12,40 +12,42 @@
         <div id="info-quiz">
             <h1 class="title text-center mb-4">Ajoutez des questions à votre quiz</h1>
 
-            <div class="row mx-auto">
-                <div class="col">
-                    <div class="row"><span class="font-weight-bold">Nom du quiz :</span></div>
-                    <div class="row d-inline-block">
+            <div class="row">
+                <div class="col-lg my-2 my-lg-0">
+                    <div class="text-center">
+                        <span class="font-weight-bold">Nom du quiz</span> <br>
                         {{ quiz.intitule|length > 20 ? quiz.intitule|slice(0,20) ~ '...' : quiz.intitule }}
                     </div>
                 </div>
 
                 {% if quiz.plageHoraireDebut %}
-                    <div class="col">
-                        <div class="row"><span class="font-weight-bold">Plage horaire de début :</span></div>
-                        <div class="row">{{ quiz.plageHoraireDebut|date("d/m/Y h:i") }}</div>
+                <div class="col-lg my-2 my-lg-0">
+                    <div class="text-center">
+                        <span class="font-weight-bold">Plage horaire de début</span> <br>
+                        {{ quiz.plageHoraireDebut|date("d/m/Y h:i") }}
                     </div>
-                    <div class="col">
-                        <div class="row"><span class="font-weight-bold">Plage horaire de fin :</span></div>
-                        <div class="row">{{ quiz.plageHoraireFin|date("d/m/Y h:i") }}</div>
+                </div>
+                <div class="col-lg my-2 my-lg-0">
+                    <div class="text-center">
+                        <span class="font-weight-bold">Plage horaire de fin</span> <br>
+                        {{ quiz.plageHoraireFin|date("d/m/Y h:i") }}
                     </div>
+                </div>
                 {% endif %}
 
                 {% if quiz.cleAcces %}
-                    <div class="col">
-                        <div class="row"><span class="font-weight-bold">Clé d'accès :</span></div>
-                        <div class="row">
-                            <span class="code text-primary mr-2">{{ quiz.cleAcces }}</span>
-                            <i id="copy" class="far fa-copy my-auto" title="Copier la clé d'accès"></i>
-                        </div>
+                <div class="col-lg my-2 my-lg-0">
+                    <div class="text-center">
+                        <span class="font-weight-bold">Clé d'accès</span> <br>
+                        <span class="text-primary code">{{ quiz.cleAcces }}</span>
+                        <i id="copy" class="far fa-copy my-auto" title="Copier la clé d'accès"></i>
                     </div>
+                </div>
                 {% endif %}
             </div>
         </div>
 
-        <div id="questionsContainer">
-
-        </div>
+        <div id="questionsContainer"></div>
 
         <div class="col text-center">
             <button id="addQuestion" class="btn btn-primary addButton">Ajouter une question</button>
