@@ -63,7 +63,6 @@ function addDeleteReponse(
   $boutonAjoutReponse,
   $boutonDeleteReponse
 ) {
-  console.log(nbReponses);
   if (nbReponses === 0) {
     //ajouter
     $boutonAjoutReponse.show();
@@ -275,6 +274,8 @@ $(document).ready(function () {
   $(document).on("submit", "form", function (e) {
     e.preventDefault();
 
+    if ($(".error_form")) $(".error_form").remove();
+
     let $questionHolder = $(e.target).parent();
     let $currentButton = $(document.activeElement);
 
@@ -293,7 +294,8 @@ $(document).ready(function () {
     }
 
     //data du formulaire
-    let $formData = $submittedForm.serialize();
+    let $formData = $submittedForm.serializeArray();
+    console.log($formData);
 
     if ($submittedForm.find(".reponses").children().length >= 3) {
       // envoie les data

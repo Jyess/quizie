@@ -143,9 +143,8 @@ class QuizController extends AbstractController
             $questionForm = $this->createForm(QuestionType::class, $uneQuestion);
             $questionForm->handleRequest($request);
 
-            $entityManager = $this->getDoctrine()->getManager();
-
             if ($questionForm->isSubmitted() && $questionForm->isValid()) {
+                $entityManager = $this->getDoctrine()->getManager();
                 $uneQuestion->setQuiz($quiz);
 
                 foreach ($reponsesBD as $reponse) {

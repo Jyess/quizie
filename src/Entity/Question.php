@@ -22,21 +22,21 @@ class Question
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Vous devez écrire une question.")
+     * @Assert\NotNull(message="Ce champs est obligatoire.")
      * @Assert\Length(max = 255, maxMessage = "Le nom du quiz doit faire moins de 255 caractères.")
      */
     private $intitule;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank(message="La question doit avoir un nombre de points en cas de bonne réponse.")
+     * @Assert\NotNull(message="La question doit avoir un nombre de points en cas de bonne réponse.")
      * @Assert\Positive(message="Le nombre de points pour une bonne réponse doit être positif.")
      */
     private $nbPointsBonneReponse;
 
     /**
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank(message="La question doit avoir un nombre de points en cas de mauvaise réponse.")
+     * @Assert\NotNull(message="La question doit avoir un nombre de points en cas de mauvaise réponse.")
      * @Assert\Negative(message="Le nombre de points pour une mauvaise réponse doit être négatif.")
      */
     private $nbPointsMauvaiseReponse;
@@ -68,7 +68,7 @@ class Question
         return $this->intitule;
     }
 
-    public function setIntitule(string $intitule): self
+    public function setIntitule($intitule): self
     {
         $this->intitule = $intitule;
 
@@ -80,7 +80,7 @@ class Question
         return $this->nbPointsBonneReponse;
     }
 
-    public function setNbPointsBonneReponse(int $nbPointsBonneReponse): self
+    public function setNbPointsBonneReponse($nbPointsBonneReponse): self
     {
         $this->nbPointsBonneReponse = $nbPointsBonneReponse;
 
@@ -92,7 +92,7 @@ class Question
         return $this->nbPointsMauvaiseReponse;
     }
 
-    public function setNbPointsMauvaiseReponse(int $nbPointsMauvaiseReponse): self
+    public function setNbPointsMauvaiseReponse($nbPointsMauvaiseReponse): self
     {
         $this->nbPointsMauvaiseReponse = $nbPointsMauvaiseReponse;
 
