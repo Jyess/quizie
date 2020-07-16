@@ -28,8 +28,8 @@ class Reponse
     private $vraiFaux;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Question::class, inversedBy="reponses")
-     * @ORM\JoinColumn(name="questionId", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity=Question::class, inversedBy="reponses", cascade={"remove"})
+     * @ORM\JoinColumn(name="questionId", referencedColumnName="id", onDelete="CASCADE")
      */
     private $question;
 

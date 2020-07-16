@@ -1,8 +1,14 @@
 $primary: #036eaf;
 $secondary: #578f89;
+$danger: #dc5353;
 $enable-responsive-font-sizes: true;
 
 @import "../../node_modules/bootstrap/scss/bootstrap";
+
+html,
+body {
+  font-family: "Roboto";
+}
 
 //tout le contenu entre le header et le footer
 #content {

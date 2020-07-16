@@ -1,19 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un quiz
+{% block title %}Tous les quiz disponibles
 {% endblock %}
 
 {% block body %}
-	<div class="container">
-		<h1 class="title text-center">Les quiz disponibles</h1>
+	<h1 class="title text-center m">Les quiz disponibles</h1>
 
-		<ul class="list-group list-group-flush">
-			{% for quiz in lesQuiz %}
-				<li class="list-group-item">
-					<a href="{{ path('quiz_faireUnQuiz', {'idQuiz' : quiz.id}) }}">{{ quiz.intitule }}</a>
-				</li>
-			{% endfor %}
-		</ul>
+	<div class="list-group text-break">
+		{% for quiz in lesQuiz %}
+			<a class="list-group-item list-group-item-action" href="{{ path('quiz_demandeAccesQuiz', {'idQuiz' : quiz.id}) }}">
+				{{ quiz.intitule }}
+
+				<span class="font-italic float-right">
+					Créé par
+					<span class="font-weight-bold">{{ quiz.utilisateurCreateur.prenom ~ ' ' ~ quiz.utilisateurCreateur.nom }}</span>
+				</span>
+			</a>
+		{% endfor %}
 	</div>
 {% endblock %}
 

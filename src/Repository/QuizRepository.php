@@ -23,15 +23,41 @@ class QuizRepository extends ServiceEntityRepository
     /**
      * @return Quiz[] Returns an array of Quiz objects
      */
+    public function findAllWithQuestions()
+    {
+        return $this->createQueryBuilder('quiz')
+            ->join('quiz.questions', 'question')
+            ->where('quiz.id = :idQuiz')
+            ->where('question > 0')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Quiz[] Returns an array of Quiz objects
+     */
+    public function hasKey($idQuiz)
+    {
+        return $this->createQueryBuilder('quiz')
+            ->select('quiz.cleAcces')
+            ->where('quiz.id = :idQuiz')
+            ->setParameter('idQuiz', $idQuiz)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return Quiz[] Returns an array of Quiz objects
+     */
     public function findQuestionsWithAnswers($idQuiz)
     {
         return $this->createQueryBuilder('quiz')
-            ->join('quiz.question', 'question')
-            ->join('question.reponse', 'reponse')
-            ->andWhere('quiz.id = :idQuiz')
+            ->join('quiz.questions', 'question')
+            ->join('question.reponses', 'reponse')
+            ->where('quiz.id = :idQuiz')
             ->setParameter('idQuiz', $idQuiz)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
     /*

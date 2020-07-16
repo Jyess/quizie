@@ -28,6 +28,7 @@ Encore
   .addEntry("questions_js", "./assets/js/questions.js")
   .addEntry("main_css", "./assets/css/app.scss")
   .addEntry("questions_css", "./assets/css/questions.css")
+  .addEntry("acces-quiz_js", "./assets/js/acces-quiz.js")
   //.addEntry('page1', './assets/js/page1.js')
   //.addEntry('page2', './assets/js/page2.js')
 

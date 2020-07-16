@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Question;
 use App\Entity\Quiz;
 use App\Entity\Reponse;
+use App\Form\DemandeCleAccesType;
 use App\Form\QuizType;
 use App\Form\QuestionType;
 use App\Form\ReponseType;
@@ -80,9 +81,12 @@ class QuizController extends AbstractController
             $question = new Question();
             $questionForm = $this->createForm(QuestionType::class, $question);
 
+            $isAvailable = $this->verifPlageHoraire($idQuiz, $quizRepository);
+
             return $this->render('quiz/creer_questions.html.twig', [
                 'quiz' => $quiz,
-                'questionFormulaire' => $questionForm->createView()
+                'questionFormulaire' => $questionForm->createView(),
+                'isAvailable' => $isAvailable
             ]);
         }
 
@@ -106,25 +110,73 @@ class QuizController extends AbstractController
      */
     public function tousLesQuiz(QuizRepository $quizRepository)
     {
-        $lesQuiz = $quizRepository->findAll();
+        $lesQuiz = $quizRepository->findAllWithQuestions();
+
         return $this->render('quiz/tous_les_quiz.html.twig', [
             'lesQuiz' => $lesQuiz
         ]);
     }
 
     /**
-     * @Route("/quiz/{idQuiz}", name="quiz_faireUnQuiz")
+     * Vérifie si le quiz est protege par une cle d'acces et affiche la page correspondante.
+     * @Route("/quiz/{idQuiz}", name="quiz_demandeAccesQuiz")
      */
-    public function faireUnQuiz($idQuiz, QuizRepository $quizRepository, ReponseRepository $reponseRepository)
+    public function demandeAccesQuiz($idQuiz, Request $request, QuizRepository $quizRepository, ReponseRepository $reponseRepository)
     {
-        $leQuiz = $quizRepository->find($idQuiz);
+        $isOwner = false;
+        if ($user = $this->getUser()) {
+            $isOwner = $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user->getId()]);
+        }
 
-        // dd($reponseRepository->findQuestionsWithAnswers($idQuiz));
-        dd($quizRepository->findQuestionsWithAnswers($idQuiz));
+        $isKeyProtected = $quizRepository->hasKey($idQuiz);
+        $leQuiz = $quizRepository->findQuestionsWithAnswers($idQuiz);
 
         return $this->render('quiz/faire_un_quiz.html.twig', [
-            'leQuiz' => $leQuiz
+            'leQuiz' => $leQuiz,
+            'canAccess' => $isOwner
         ]);
+    }
+
+    /**
+     * Verifie si la cle d'acces est correcte et affiche la quiz si c'est la cas.
+     * @Route("/afficher-quiz/{idQuiz}", name="quiz_afficherQuiz")
+     */
+    public function afficherQuiz($idQuiz, Request $request, QuizRepository $quizRepository)
+    {
+        $isOwner = false;
+        if ($user = $this->getUser()) {
+            $isOwner = $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user->getId()]);
+        }
+
+        if ($request->isMethod(Request::METHOD_POST) || $isOwner) {
+            //verif de la clé d'acces
+            $cleAccesSaisie = $request->request->get('cleAcces');
+            $cleAccesCorrecte = $quizRepository->findBy(['cleAcces' => $cleAccesSaisie, 'id' => $idQuiz]);
+
+            //si c'est le créateur qui veut afficher son quiz, pas besoin de verif, sinon on verif la cle
+            if ($isOwner) {
+                $leQuiz = $quizRepository->find($idQuiz);
+
+                return $this->render('quiz/faire_un_quiz.html.twig', [
+                    'leQuiz' => $leQuiz,
+                    'canAccess' => $isOwner
+                ]);
+            } else if ($cleAccesCorrecte) {
+                $leQuiz = $quizRepository->findQuestionsWithAnswers($idQuiz);
+                $isAvailable = $this->verifPlageHoraire($leQuiz->getId(), $quizRepository);
+
+                return $this->render('quiz/faire_un_quiz.html.twig', [
+                    'leQuiz' => $leQuiz,
+                    'isAvailable' => $isAvailable,
+                    'canAccess' => true
+                ]);
+            } else {
+                return new JsonResponse(['error' => 'wrong pwd'], 200);
+            }
+        }
+
+        // return new JsonResponse(['code' => 406], 406);
+        throw new AccessDeniedException();
     }
 
     /**
@@ -148,10 +200,12 @@ class QuizController extends AbstractController
      */
     public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
-        $user = $this->getUser();
-        $isQuizOwner = $quizRepository->findOneBy(["id" => $idQuiz, "utilisateurCreateur" => $user->getId()]);
+        $isOwner = false;
+        if ($user = $this->getUser()) {
+            $isOwner = $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user->getId()]);
+        }
 
-        if ($request->isMethod(Request::METHOD_POST) && $isQuizOwner) {
+        if ($request->isMethod(Request::METHOD_POST) && $isOwner) {
             //reponses de la question dans la bdd
             $reponsesBD = new ArrayCollection();
 
@@ -203,10 +257,12 @@ class QuizController extends AbstractController
      */
     public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
-        $user = $this->getUser();
-        $isQuizOwner = $quizRepository->findOneBy(["id" => $idQuiz, "utilisateurCreateur" => $user->getId()]);
+        $isOwner = false;
+        if ($user = $this->getUser()) {
+            $isOwner = $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user->getId()]);
+        }
 
-        if ($request->isMethod(Request::METHOD_GET) && $isQuizOwner) {
+        if ($request->isMethod(Request::METHOD_GET) && $isOwner) {
             $question = $questionRepository->find($idQuestion);
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -218,5 +274,49 @@ class QuizController extends AbstractController
 
         // return new JsonResponse(['code' => 406], 406);
         throw new AccessDeniedException();
+    }
+
+    /**
+     * @Route("/delete-quiz/{idQuiz}", name="quiz_deleteQuiz")
+     */
+    public function deleteQuiz($idQuiz, QuizRepository $quizRepository)
+    {
+        $isOwner = false;
+        if ($user = $this->getUser()) {
+            $isOwner = $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user->getId()]);
+        }
+
+        if ($isOwner) {
+            $quizASupprimer = $quizRepository->find($idQuiz);
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($quizASupprimer);
+            $entityManager->flush();
+
+            $mesQuiz = $quizRepository->findBy(['utilisateurCreateur' => $this->getUser()]);
+
+            return $this->render('quiz/tous_mes_quiz.html.twig', [
+                'mesQuiz' => $mesQuiz
+            ]);
+        }
+
+        // return new JsonResponse(['code' => 406], 406);
+        throw new AccessDeniedException();
+    }
+
+    private function verifPlageHoraire($idQuiz, QuizRepository $quizRepository) {
+        date_default_timezone_set('Europe/Paris');
+
+        $quiz = $quizRepository->find($idQuiz);
+
+        $start = $quiz->getPlageHoraireDebut()->format("Y-m-d H:i:s");
+        $end = $quiz->getPlageHoraireFin()->format("Y-m-d H:i:s");
+        $currentTime = date("Y-m-d H:i:s");
+
+        if ($start <= $currentTime && $currentTime <= $end) {
+            return true;
+        }
+
+        return false;
     }
 }

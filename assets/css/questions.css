@@ -121,13 +121,13 @@ input[type="number"] {
 /*couleur des mauvaises reponses*/
 
 .reponses textarea {
-  background-color: rgba(215, 103, 94, 0.2) !important;
+  background-color: rgba(222, 40, 52, 0.2) !important;
 }
 
 /*couleur des bonnes reponses*/
 
 .reponses > div:first-child textarea {
-  background-color: rgba(130, 215, 94, 0.2) !important;
+  background-color: rgba(112, 217, 68, 0.2) !important;
 }
 
 /*change le curseur pour les boutons desactives*/

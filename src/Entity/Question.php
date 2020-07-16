@@ -42,8 +42,8 @@ class Question
     private $nbPointsMauvaiseReponse;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Quiz::class, inversedBy="questions")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=Quiz::class, inversedBy="questions", cascade={"remove"})
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $quiz;
 

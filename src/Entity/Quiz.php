@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\QuizRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -50,8 +51,8 @@ class Quiz
     private $utilisateurCreateur;
 
     /**
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="quiz")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="quiz", cascade={"remove"})
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $questions;
 
@@ -120,7 +121,7 @@ class Quiz
         return $this;
     }
 
-    public function getQuestions(): ?Question
+    public function getQuestions(): ?Collection
     {
         return $this->questions;
     }
