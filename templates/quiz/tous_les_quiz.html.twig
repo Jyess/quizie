@@ -8,7 +8,7 @@
 
 	<div class="list-group text-break">
 		{% for quiz in lesQuiz %}
-			<a class="list-group-item list-group-item-action" href="{{ path('quiz_demandeAccesQuiz', {'idQuiz' : quiz.id}) }}">
+			<a class="list-group-item list-group-item-action" href="{{ path('quiz_afficherQuiz', {'idQuiz' : quiz.id}) }}">
 				{{ quiz.intitule }}
 
 				<span class="font-italic float-right">

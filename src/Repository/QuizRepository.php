@@ -36,7 +36,7 @@ class QuizRepository extends ServiceEntityRepository
     /**
      * @return Quiz[] Returns an array of Quiz objects
      */
-    public function hasKey($idQuiz)
+    public function hasAccessKey($idQuiz)
     {
         return $this->createQueryBuilder('quiz')
             ->select('quiz.cleAcces')

@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Demande d'accès
+{% endblock %}
+
+
+{% block body %}
+
+	<h1 class="title text-center">Ce quiz est privé</h1>
+
+	<div>
+		<p class="text-center my-3">Une clé d'accès est demandée pour pouvoir accéder à ce quiz. Veuillez la renseigner dans le champ ci-dessous.</p>
+
+		<form>
+			<div class="form-group col-lg-6 mx-auto">
+				<div id="error"></div>
+				<input id="idQuiz" type="hidden" value="{{ leQuiz.id }}">
+
+				<label for="colFormLabelLg" class="col-form-label col-form-label-lg">Clé d'accès</label>
+				<input type="text" name="cleAcces" class="form-control form-control-lg" maxlength="5" id="colFormLabelLg">
+				<small id="codeHelp" class="form-text text-muted">Ce code est fourni par le créateur du quiz.</small>
+				<button type="submit" class="btn btn-primary mt-3">Vérifier le code</button>
+			</div>
+		</form>
+	</div>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('acces-quiz_js') }}
+{% endblock %}

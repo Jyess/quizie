@@ -22,7 +22,7 @@ $(document).on("submit", "form", function (e) {
     type: "POST",
     data: $formData,
     // route qui va verifier le code acces du quiz
-    url: "/afficher-quiz/" + $idQuiz,
+    url: "/quiz/" + $idQuiz,
     success: function (data, textStatus, xhr) {
       if (data.error) {
         $("#error").html(

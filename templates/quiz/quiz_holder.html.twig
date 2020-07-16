@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz
+{% endblock %}
+
+{% block body %}
+	<input id="idQuiz" type="hidden" value="{{ leQuiz.id }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('affichage-quiz_js') }}
+{% endblock %}

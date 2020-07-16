@@ -1,82 +1,61 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}{{ leQuiz.intitule }}
-{% endblock %}
-
 {% block body %}
-	{% if canAccess %}
-		<h1 class="title text-center">{{ leQuiz.intitule }}</h1>
-		<div class="text-center text-black-50">Créé par
-			<cite title="Source Title">{{ leQuiz.utilisateurCreateur.prenom ~ ' ' ~leQuiz.utilisateurCreateur.nom }}</cite>
+	<h1 class="title text-center">{{ leQuiz.intitule }}</h1>
+	<div class="text-center text-black-50">Créé par
+		<cite title="Source Title">{{ leQuiz.utilisateurCreateur.prenom ~ ' ' ~ leQuiz.utilisateurCreateur.nom }}</cite>
+	</div>
+
+	{% if quizAvecQuestionsReponses is null %}
+		<div class="alert alert-secondary my-3" role="alert">
+			Vous n'avez pas encore créer de questions pour ce quiz.
 		</div>
 
-		{% if leQuiz.questions is empty %}
+		<a class="btn btn-secondary" href="{{ path('quiz_modifierQuiz', { 'idQuiz' : leQuiz.id }) }}" role="button">Créer des questions</a>
+	{% else %}
+
+		{% if quizAvailable %}
+			{% set numQuestion = 0 %}
+			{% for question in quizAvecQuestionsReponses.questions %}
+				{% set numQuestion = numQuestion + 1 %}
+
+				<div class="card my-4">
+					<h5 class="card-header">
+						#{{ numQuestion }}
+						:
+						{{ question.intitule }}
+					</h5>
+					<input type="hidden" name="id-question" value="{{ question.id }}">
+
+					<div class="card-body">
+						{% for reponse in question.reponses %}
+							<div class="custom-control custom-radio py-2">
+								<input type="radio" id="{{ reponse.id }}" name="quesion{{ question.id }}" class="custom-control-input">
+								<label class="custom-control-label" for="{{ reponse.id }}">{{ reponse.intitule }}</label>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+
+			{% endfor %}
+
+			<div class="text-center">
+				<button class="btn btn-primary btn-lg" type="submit">Valider le questionnaire</button>
+			</div>
+		{% else %}
+			{# quiz plus disponible #}
 			<div class="alert alert-secondary my-3" role="alert">
-				Vous n'avez pas encore créer de questions pour ce quiz.
+				Ce quiz était disponible du
+				<span class="font-weight-bold">{{ leQuiz.plageHoraireDebut|date("d/m/Y à G:i", false) }}</span>
+				au
+				<span class="font-weight-bold">{{ leQuiz.plageHoraireFin|date("d/m/Y à G:i", false) }}</span>.
 			</div>
 
-			<a class="btn btn-secondary" href="{{ path('quiz_modifierQuiz', { 'idQuiz' : leQuiz.id }) }}" role="button">Créer des questions</a>
-		{% else %}
-
-			{% if isAvailable %}
-
-				{% set index = 0 %}
-				{% for question in leQuiz.questions %}
-					{% set index = index + 1 %}
-
-					<div class="card my-4">
-						<h5 class="card-header">#{{ index }} : {{ question.intitule }}</h5>
-						<input type="hidden" name="id-question" value="{{ question.id }}">
-
-						<div class="card-body">
-							{% for reponse in question.reponses %}
-								<div class="custom-control custom-radio py-2">
-									<input type="radio" id="{{ reponse.id }}" name="quesion{{ question.id }}" class="custom-control-input">
-									<label class="custom-control-label" for="{{ reponse.id }}">{{ reponse.intitule }}</label>
-								</div>
-							{% endfor %}
-						</div>
-					</div>
-
-				{% endfor %}
-
-				<div class="text-center">
-					<button class="btn btn-primary btn-lg" type="submit">Valider le questionnaire</button>
-				</div>
-			{% else %}
-				<div class="alert alert-secondary my-3" role="alert">
-					Ce quiz était disponible du
-					<span class="font-weight-bold">{{ leQuiz.plageHoraireDebut|date("d/m/Y à G:i", false) }}</span> au
-					<span class="font-weight-bold">{{ leQuiz.plageHoraireFin|date("d/m/Y à G:i", false) }}</span>.
-				</div>
-
-				<a class="btn btn-secondary" href="{{ path('quiz_tousLesQuiz') }}" role="button">Voir d'autres quiz</a>
-			{% endif %}
-
+			<a class="btn btn-secondary" href="{{ path('quiz_tousLesQuiz') }}" role="button">Voir d'autres quiz</a>
 		{% endif %}
-	{% else %}
-		<h1 class="title text-center">Ce quiz est privé</h1>
 
-		<div>
-			<p class="text-center my-3">Une clé d'accès est demandée pour pouvoir accéder à ce quiz. Veuillez la renseigner dans le champ ci-dessous.</p>
-
-			<form>
-				<div class="form-group col-lg-6 mx-auto">
-					<div id="error"></div>
-					<input id="idQuiz" type="hidden" value="{{ leQuiz.id }}">
-
-					<label for="colFormLabelLg" class="col-form-label col-form-label-lg">Clé d'accès</label>
-					<input type="text" name="cleAcces" class="form-control form-control-lg" maxlength="5" id="colFormLabelLg">
-					<small id="codeHelp" class="form-text text-muted">Ce code est fourni par le créateur du quiz.</small>
-					<button type="submit" class="btn btn-primary mt-3">Vérifier le code</button>
-				</div>
-			</form>
-		</div>
 	{% endif %}
 
 {% endblock %}
 
 {% block javascripts %}
-	{{ parent() }}
 	{{ encore_entry_script_tags('acces-quiz_js') }}
 {% endblock %}

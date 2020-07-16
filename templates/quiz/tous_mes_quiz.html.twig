@@ -10,17 +10,21 @@
 		{% for unQuiz in mesQuiz %}
 			<div class="row">
 				<div class="col-lg-10">
-					<a title="Faire le quiz" href="{{ path("quiz_demandeAccesQuiz", { 'idQuiz' : unQuiz.id }) }}" class="list-group-item list-group-item-action">
+					<a title="Faire le quiz" href="{{ path("quiz_afficherQuiz", { 'idQuiz' : unQuiz.id }) }}" class="list-group-item list-group-item-action">
 						{{ unQuiz.intitule }}
 					</a>
 				</div>
 
 				<div class="row col-lg-2 my-auto mx-auto">
 					<div class="col">
-						<a href="{{ path("quiz_modifierQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Modifier le quiz"><i class="fas fa-pen"></i></a>
+						<a href="{{ path("quiz_modifierQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Modifier le quiz">
+							<i class="fas fa-pen"></i>
+						</a>
 					</div>
 					<div class="col">
-						<a class="text-danger supprimerQuiz" href="{{ path("quiz_deleteQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Supprimer le quiz"><i class="fas fa-trash"></i></a>
+						<a class="text-danger supprimerQuiz" href="{{ path("quiz_deleteQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Supprimer le quiz">
+							<i class="fas fa-trash"></i>
+						</a>
 					</div>
 				</div>
 			</div>

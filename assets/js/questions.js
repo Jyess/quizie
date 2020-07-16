@@ -388,6 +388,7 @@ $(document).ready(function () {
       url: "/delete-question/" + $idQuiz + "/" + $idQuestion, //route qui va recup les data et enregistrer la question dans la bd,
       success: function (data, textStatus, xhr) {
         $formHolder.remove();
+        changeOrdreQuestion();
       },
     }).fail(function () {
       console.log("error");
