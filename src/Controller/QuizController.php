@@ -289,10 +289,10 @@ class QuizController extends AbstractController
     /**
      * @Route("/delete-quiz/{idQuiz}", name="quiz_deleteQuiz")
      */
-    public function deleteQuiz($idQuiz, Request $request, QuizRepository $quizRepository)
+    public function deleteQuiz($idQuiz, QuizRepository $quizRepository)
     {
         //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_DELETE) || !$this->isOwner($idQuiz)) {
+        if (!$this->isOwner($idQuiz)) {
             throw new AccessDeniedException();
         }
 
