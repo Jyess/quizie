@@ -2,7 +2,7 @@
 	{# debut bloc question #}
 	{{ form_start(questionFormulaire) }}
 
-	<input class="js-question-id" type="hidden" name="js-question-id" value="{{ question.id }}">
+	<div class="js-question-id" data-question-id="{{ question.id }}"></div>
 
 	<div class="jumbotron shadow-sm mt-5 p-4">
 

@@ -20,6 +20,22 @@ class QuestionRepository extends ServiceEntityRepository
         parent::__construct($registry, Question::class);
     }
 
+    /**
+     * @return Question Returns a Question object or null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isQuestionOwner($idQuestion, $idQuiz)
+    {
+        return $this->createQueryBuilder('question')
+            ->join('question.quiz', 'quiz')
+            ->where('question.id = :idQuestion')
+            ->andWhere('quiz.id = :idQuiz')
+            ->setParameter('idQuestion', $idQuestion)
+            ->setParameter('idQuiz', $idQuiz)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Question[] Returns an array of Question objects
     //  */

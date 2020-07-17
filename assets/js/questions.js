@@ -286,7 +286,7 @@ $(document).ready(function () {
     $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
 
     // id de la question si présent (modification)
-    let $idQuestion = $submittedForm.find(".js-question-id").val();
+    let $idQuestion = $submittedForm.find(".js-question-id").data("questionId");
 
     let $url = "/manage-question/" + $quizId;
     if ($idQuestion) {
@@ -309,7 +309,10 @@ $(document).ready(function () {
           $currentButton.find("svg").remove();
 
           //met l'id de la question dans un champ caché
-          $($submittedForm).find(".js-question-id").val(data.idQuestion);
+          // $($submittedForm).find(".js-question-id").val(data.idQuestion);
+          $submittedForm
+            .find(".js-question-id")
+            .data("questionId", data.idQuestion);
 
           //si on revoie un code 200, la requete n'a pas mené à la creation d'une ressource
           //et on raffiche le form avec les erreurs
@@ -380,9 +383,11 @@ $(document).ready(function () {
     let $idQuiz = $quizIdHolder.data("quizId");
 
     // id de la question
-    let $idQuestion = $formHolder.find(".js-question-id").val();
+    // let $idQuestion = $formHolder.find(".js-question-id").val();
+    let $idQuestion = $formHolder.find(".js-question-id").data("questionId");
 
     $.ajax({
+      type: "DELETE",
       // route qui va recup les data et enregistrer la question dans la bd
       // url: Routing.generate("quiz_enregistrerQuestion"),
       url: "/delete-question/" + $idQuiz + "/" + $idQuestion, //route qui va recup les data et enregistrer la question dans la bd,

@@ -14,6 +14,7 @@ use App\Repository\QuizRepository;
 use App\Repository\ReponseRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use http\QueryString;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -75,12 +76,12 @@ class QuizController extends AbstractController
      */
     public function modifierQuiz($idQuiz, QuizRepository $quizRepository)
     {
-        if (!$this->exist($idQuiz, $quizRepository)) {
+        if (!$this->exist($idQuiz)) {
             throw new NotFoundHttpException();
         }
 
         //vérifie que le user connecté est bien le créateur
-        if ($this->isOwner($idQuiz, $quizRepository)) {
+        if ($this->isOwner($idQuiz)) {
             $quiz = $quizRepository->find($idQuiz);
 
             $question = new Question();
@@ -129,12 +130,12 @@ class QuizController extends AbstractController
     public function afficherQuiz($idQuiz, QuizRepository $quizRepository, Request $request)
     {
         //si le quiz n'existe pas on renvoie erreur 404
-        if (!$this->exist($idQuiz, $quizRepository)) {
+        if (!$this->exist($idQuiz)) {
             throw new NotFoundHttpException();
         }
 
         //verif si la personne connecté est le créateur du quiz
-        $isOwner = $this->isOwner($idQuiz, $quizRepository);
+        $isOwner = $this->isOwner($idQuiz);
 
         //verif si le quiz est protégé par une clé d'accès
         $isKeyProtected = $quizRepository->hasAccessKey($idQuiz);
@@ -154,6 +155,11 @@ class QuizController extends AbstractController
 
         //t'es le createur ?
         if (!$isOwner) {
+
+            if (!$quizAvecQuestionsReponses) {
+                throw new AccessDeniedException();
+            }
+
             //quiz privé  et clé non saisie ? on demande l'acces
             if ($isKeyProtected && !$cleAccesSaisie) {
                 return $this->render('quiz/demande_acces.html.twig', [
@@ -187,12 +193,12 @@ class QuizController extends AbstractController
      */
     public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
-        if (!$this->exist($idQuiz, $quizRepository)) {
+        if (!$this->exist($idQuiz)) {
             throw new NotFoundHttpException();
         }
 
         //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_GET) && !$this->isOwner($idQuiz, $quizRepository)) {
+        if (!$request->isMethod(Request::METHOD_GET) && !$this->isOwner($idQuiz, $idQuestion)) {
             throw new AccessDeniedException();
         }
 
@@ -208,8 +214,13 @@ class QuizController extends AbstractController
     /**
      * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
      */
-    public function recupererQuestionsDejaCreees($idQuiz, QuestionRepository $questionRepository, QuizRepository $quizRepository)
+    public function recupererQuestionsDejaCreees($idQuiz, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository)
     {
+        //vérifie que le user connecté est bien le créateur
+        if (!$request->isMethod(Request::METHOD_POST) && !$this->isOwner($idQuiz)) {
+            throw new AccessDeniedException();
+        }
+
         $quiz = $quizRepository->find($idQuiz);
         $questions = $questionRepository->findBy(["quiz" => $quiz]);
 
@@ -222,12 +233,14 @@ class QuizController extends AbstractController
     }
 
     /**
+     * Modifie ou supprime une question.
+     *
      * @Route("/manage-question/{idQuiz}/{idQuestion}", name="quiz_manageQuestion", options = { "expose" = true }, defaults={"idQuestion"=null})
      */
     public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository)
     {
         //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_POST) && !$this->isOwner($idQuiz, $quizRepository)) {
+        if (!$request->isMethod(Request::METHOD_POST) || !$this->isOwner($idQuiz, $idQuestion)) {
             throw new AccessDeniedException();
         }
 
@@ -276,10 +289,10 @@ class QuizController extends AbstractController
     /**
      * @Route("/delete-quiz/{idQuiz}", name="quiz_deleteQuiz")
      */
-    public function deleteQuiz($idQuiz, QuizRepository $quizRepository)
+    public function deleteQuiz($idQuiz, Request $request, QuizRepository $quizRepository)
     {
         //vérifie que le user connecté est bien le créateur
-        if (!$this->isOwner($idQuiz, $quizRepository)) {
+        if (!$request->isMethod(Request::METHOD_DELETE) || !$this->isOwner($idQuiz)) {
             throw new AccessDeniedException();
         }
 
@@ -325,12 +338,36 @@ class QuizController extends AbstractController
     }
 
     /**
-     * Vérifie si l'utilisateur actuel est bien celui qui a créé le quiz.
+     * Vérifie si l'utilisateur actuel est bien celui qui a créé le quiz ou la question.
+     *
+     * @param $idQuiz
+     * @param null $idQuestion
+     * @return Quiz[]|bool|object[]
      */
-    private function isOwner($idQuiz, QuizRepository $quizRepository)
+    private function isOwner($idQuiz, $idQuestion = null)
     {
+        if ($idQuestion) {
+            $questionRepository = $this->getDoctrine()->getRepository(Question::class);
+            //si c'est pas vide et qu'on a une question c bon
+            return !empty($questionRepository->isQuestionOwner($idQuestion, $idQuiz));
+        }
+
+        return $this->isQuizOwner($idQuiz);
+    }
+
+    /**
+     * Vérifie si l'utilisateur est bien le créateur du quiz.
+     *
+     * @param $idQuiz
+     * @return Quiz[]|bool|object[]
+     */
+    private function isQuizOwner($idQuiz)
+    {
+        $quizRepository = $this->getDoctrine()->getRepository(Quiz::class);
+
         if ($user = $this->getUser()) {
-            return $quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user]);
+            //pas vide donc owner ok
+            return !empty($quizRepository->findBy(['id' => $idQuiz, 'utilisateurCreateur' => $user]));
         }
 
         return false;
@@ -338,9 +375,13 @@ class QuizController extends AbstractController
 
     /**
      * Vérifie si un quiz existe.
+     *
+     * @param $idQuiz
+     * @return Quiz|object|null
      */
-    private function exist($idQuiz, QuizRepository $quizRepository)
+    private function exist($idQuiz)
     {
+        $quizRepository = $this->getDoctrine()->getRepository(Quiz::class);
         return $quizRepository->find($idQuiz);
     }
 }

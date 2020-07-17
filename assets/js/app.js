@@ -26,9 +26,3 @@ require("@fortawesome/fontawesome-free/js/all.js");
 //
 // Routing.setRoutingData(routes);
 // Routing.generate("rep_log_list");
-
-$(function () {
-  $('[data-toggle="popover"]').popover();
-});
-
-$("#copy").delay(2000).popover("hide");
