@@ -15,16 +15,14 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 class QuizService
 {
     private $quizRepository;
-
     private $questionRepository;
-
     private $utilisateur;
 
     /**
      * QuizService constructor.
-     * @param $quizRepository
-     * @param $questionRepository
-     * @param $utilisateur
+     * @param QuizRepository $quizRepository
+     * @param QuestionRepository $questionRepository
+     * @param Security $security
      */
     public function __construct(QuizRepository $quizRepository, QuestionRepository $questionRepository, Security $security)
     {
@@ -42,14 +40,6 @@ class QuizService
     }
 
     /**
-     * @param mixed $quizRepository
-     */
-    public function setQuizRepository($quizRepository): void
-    {
-        $this->quizRepository = $quizRepository;
-    }
-
-    /**
      * @return mixed
      */
     public function getQuestionRepository()
@@ -58,27 +48,11 @@ class QuizService
     }
 
     /**
-     * @param mixed $questionRepository
-     */
-    public function setQuestionRepository($questionRepository): void
-    {
-        $this->questionRepository = $questionRepository;
-    }
-
-    /**
      * @return mixed
      */
     public function getUtilisateur()
     {
         return $this->utilisateur;
-    }
-
-    /**
-     * @param mixed $utilisateur
-     */
-    public function setUtilisateur($utilisateur): void
-    {
-        $this->utilisateur = $utilisateur;
     }
 
     /**

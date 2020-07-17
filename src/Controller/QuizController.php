@@ -76,6 +76,8 @@ class QuizController extends AbstractController
     /**
      * @Route("/modifier-quiz/{idQuiz}", name="quiz_modifierQuiz")
      * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param QuizService $quizService
      * @return Response
      */
     public function modifierQuiz($idQuiz, QuizRepository $quizRepository, QuizService $quizService)
@@ -105,6 +107,8 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/mes-quiz", name="quiz_voirTousMesQuiz")
+     * @param QuizRepository $quizRepository
+     * @return Response
      */
     public function voirTousMesQuiz(QuizRepository $quizRepository)
     {
@@ -117,6 +121,8 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/quiz", name="quiz_tousLesQuiz")
+     * @param QuizRepository $quizRepository
+     * @return Response
      */
     public function tousLesQuiz(QuizRepository $quizRepository)
     {
@@ -130,6 +136,11 @@ class QuizController extends AbstractController
     /**
      * Vérifie si le quiz est protege par une cle d'acces et affiche la page correspondante.
      * @Route("/quiz/{idQuiz}", name="quiz_afficherQuiz")
+     * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param Request $request
+     * @param QuizService $quizService
+     * @return JsonResponse|Response
      */
     public function afficherQuiz($idQuiz, QuizRepository $quizRepository, Request $request, QuizService $quizService)
     {
@@ -145,7 +156,7 @@ class QuizController extends AbstractController
         $isKeyProtected = $quizRepository->hasAccessKey($idQuiz);
 
         //verif si le quiz est disponible ou pas
-        $quizAvailable = $quizService->verifPlageHoraire($idQuiz, $quizRepository);
+        $quizAvailable = $quizService->verifPlageHoraire($idQuiz);
 
         //récup les questions reponses du quiz (si pas de questions, renvoie null)
         $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
@@ -176,19 +187,12 @@ class QuizController extends AbstractController
             }
         }
 
-        $questionnaireForm = $this->createForm(QuestionnaireType::class);
-        $questionnaireForm->handleRequest($request);
-        if ($questionnaireForm->isSubmitted() && $questionnaireForm->isValid()) {
-
-        }
-
         //si on est le createur du quiz
         if ($request->isMethod(Request::METHOD_POST)) {
             return $this->render('quiz/faire_un_quiz.html.twig', [
                 'quizAvecQuestionsReponses' => $quizAvecQuestionsReponses,
                 'leQuiz' => $leQuiz,
-                'quizAvailable' => $quizAvailable,
-                'questionnaireForm' => $questionnaireForm->createView()
+                'quizAvailable' => $quizAvailable
             ]);
         }
 
@@ -201,8 +205,14 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/delete-question/{idQuiz}/{idQuestion}", name="quiz_deleteQuestion")
+     * @param $idQuiz
+     * @param $idQuestion
+     * @param Request $request
+     * @param QuestionRepository $questionRepository
+     * @param QuizService $quizService
+     * @return JsonResponse
      */
-    public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository, QuizService $quizService)
+    public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuestionRepository $questionRepository, QuizService $quizService)
     {
         if (!$quizService->exist($idQuiz)) {
             throw new NotFoundHttpException();
@@ -224,6 +234,12 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
+     * @param $idQuiz
+     * @param Request $request
+     * @param QuestionRepository $questionRepository
+     * @param QuizRepository $quizRepository
+     * @param QuizService $quizService
+     * @return JsonResponse
      */
     public function recupererQuestionsDejaCreees($idQuiz, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository, QuizService $quizService)
     {
@@ -247,6 +263,13 @@ class QuizController extends AbstractController
      * Modifie ou supprime une question.
      *
      * @Route("/manage-question/{idQuiz}/{idQuestion}", name="quiz_manageQuestion", options = { "expose" = true }, defaults={"idQuestion"=null})
+     * @param $idQuiz
+     * @param $idQuestion
+     * @param Request $request
+     * @param QuizRepository $quizRepository
+     * @param QuestionRepository $questionRepository
+     * @param QuizService $quizService
+     * @return JsonResponse|Response
      */
     public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository, QuizService $quizService)
     {
@@ -299,6 +322,10 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/delete-quiz/{idQuiz}", name="quiz_deleteQuiz")
+     * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param QuizService $quizService
+     * @return Response
      */
     public function deleteQuiz($idQuiz, QuizRepository $quizRepository, QuizService $quizService)
     {
@@ -322,8 +349,36 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/verif-quiz/{idQuiz}", name="quiz_verifQuiz")
+     * @param Request $request
      */
-    public function verifQuiz(Request $request) {
-        dd($request->request->get());
+    public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository,ReponseRepository $reponseRepository)
+    {
+        $resultat = new Resultat();
+        $quiz = $quizRepository->find($idQuiz);
+        $resultat->setQuiz($quiz);
+
+        $score = 0;
+        $questionsReponsesUser = $request->request->all();
+
+        foreach ($questionsReponsesUser as $idQuestion => $idReponse) {
+            $question = $questionRepository->find($idQuestion);
+
+            $reponse = $reponseRepository->find($idReponse);
+            $resultat->addReponse($reponse);
+
+            if ($reponse->getVraiFaux()) {
+                $score += $question->getNbPointsBonneReponse();
+            } else {
+                $score += $question->getNbPointsMauvaiseReponse();
+            }
+        }
+
+        $resultat->setScore($score);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($resultat);
+        $entityManager->flush();
+
+        return new JsonResponse(['data' => 'ok'], 200);
     }
 }

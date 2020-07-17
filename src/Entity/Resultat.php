@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ResultatRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -32,7 +34,12 @@ class Resultat
      * @ORM\ManyToMany(targetEntity="Reponse")
      * @ORM\JoinColumn(name="reponseId", referencedColumnName="id")
      */
-    private $reponse;
+    private $reponses;
+
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -63,15 +70,13 @@ class Resultat
         return $this;
     }
 
-    public function getReponse(): ?reponse
+    public function getReponses(): ?Collection
     {
-        return $this->reponse;
+        return $this->reponses;
     }
 
-    public function setReponse(?reponse $reponse): self
+    public function addReponse(Reponse $reponse)
     {
-        $this->reponse = $reponse;
-
-        return $this;
+        $this->reponses->add($reponse);
     }
 }

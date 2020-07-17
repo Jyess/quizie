@@ -1,66 +1,77 @@
 {% block body %}
-	<h1 class="title text-center">{{ leQuiz.intitule }}</h1>
-	<div class="text-center text-black-50">Créé par
-		<cite title="Source Title">{{ leQuiz.utilisateurCreateur.prenom ~ ' ' ~ leQuiz.utilisateurCreateur.nom }}</cite>
-	</div>
+    <h1 class="title text-center">{{ leQuiz.intitule }}</h1>
+    <div class="text-center text-black-50">Créé par
+        <cite title="Source Title">{{ leQuiz.utilisateurCreateur.prenom ~ ' ' ~ leQuiz.utilisateurCreateur.nom }}</cite>
+    </div>
 
-	{% if quizAvecQuestionsReponses is null %}
-		<div class="alert alert-secondary my-3" role="alert">
-			Vous n'avez pas encore créer de questions pour ce quiz.
-		</div>
+    {% if quizAvecQuestionsReponses is null %}
+        <div class="alert alert-secondary my-3" role="alert">
+            Vous n'avez pas encore créer de questions pour ce quiz.
+        </div>
 
-		<a class="btn btn-secondary" href="{{ path('quiz_modifierQuiz', { 'idQuiz' : leQuiz.id }) }}" role="button">Créer des questions</a>
-	{% else %}
+        <a class="btn btn-secondary" href="{{ path('quiz_modifierQuiz', { 'idQuiz' : leQuiz.id }) }}" role="button">Créer
+            des questions</a>
+    {% else %}
 
-		{% if quizAvailable %}
+        {% if quizAvailable %}
 
-			<form>
+            <form>
 
-			{% set numQuestion = 0 %}
-			{% for question in quizAvecQuestionsReponses.questions %}
-				{% set numQuestion = numQuestion + 1 %}
+                <div class="js-quiz-id" data-quiz-id="{{ leQuiz.id }}"></div>
 
-				<div class="card my-4">
-					<h5 class="card-header">
-						#{{ numQuestion }}
-						:
-						{{ question.intitule }}
-					</h5>
-					<input type="hidden" name="id-question" value="{{ question.id }}">
+                {% set numQuestion = 0 %}
+                {% for question in quizAvecQuestionsReponses.questions %}
+                    {% set numQuestion = numQuestion + 1 %}
 
-					<div class="card-body">
-						{% for reponse in question.reponses %}
-							<div class="custom-control custom-radio py-2">
-								<input type="radio" id="{{ reponse.id }}" name="quesion{{ question.id }}" value="{{ reponse.id }}" class="custom-control-input">
-								<label class="custom-control-label" for="{{ reponse.id }}">{{ reponse.intitule }}</label>
-							</div>
-						{% endfor %}
-					</div>
-				</div>
+                    <div class="card my-4">
+                        <h5 class="card-header">
+                            #{{ numQuestion }}
+                            :
+                            {{ question.intitule }}
+                        </h5>
 
-			{% endfor %}
+                        {% set arrayReponses = [] %}
+                        {% for reponse in question.reponses %}
+                            {% set arrayReponses = arrayReponses|merge([reponse]) %}
+                        {% endfor %}
 
-			<div class="text-center">
-				<button class="btn btn-primary btn-lg">Valider le questionnaire</button>
-			</div>
+                        <div class="card-body">
+                            {% for reponse in arrayReponses|shuffle %}
+                                <div class="custom-control custom-radio py-2">
+                                    <input type="radio" id="{{ reponse.id }}" name="{{ question.id }}"
+                                           value="{{ reponse.id }}" class="custom-control-input" required>
+                                    <label class="custom-control-label"
+                                           for="{{ reponse.id }}">{{ reponse.intitule }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-			</form>
-		{% else %}
-			{# quiz plus disponible #}
-			<div class="alert alert-secondary my-3" role="alert">
-				Ce quiz était disponible du
-				<span class="font-weight-bold">{{ leQuiz.plageHoraireDebut|date("d/m/Y à G:i", false) }}</span>
-				au
-				<span class="font-weight-bold">{{ leQuiz.plageHoraireFin|date("d/m/Y à G:i", false) }}</span>.
-			</div>
+                {% endfor %}
 
-			<a class="btn btn-secondary" href="{{ path('quiz_tousLesQuiz') }}" role="button">Voir d'autres quiz</a>
-		{% endif %}
+                <div class="text-center">
+                    <button class="btn btn-primary btn-lg">Valider le questionnaire</button>
+                </div>
 
-	{% endif %}
+                <div id="quizSubmitted" class="my-2 col-lg-6 mx-auto"></div>
+
+            </form>
+        {% else %}
+            {# quiz plus disponible #}
+            <div class="alert alert-secondary my-3" role="alert">
+                Ce quiz était disponible du
+                <span class="font-weight-bold">{{ leQuiz.plageHoraireDebut|date("d/m/Y à G:i", false) }}</span>
+                au
+                <span class="font-weight-bold">{{ leQuiz.plageHoraireFin|date("d/m/Y à G:i", false) }}</span>.
+            </div>
+
+            <a class="btn btn-secondary" href="{{ path('quiz_tousLesQuiz') }}" role="button">Voir d'autres quiz</a>
+        {% endif %}
+
+    {% endif %}
 
 {% endblock %}
 
 {% block javascripts %}
-	{{ encore_entry_script_tags('submit-reponse_js') }}
+    {{ encore_entry_script_tags('submit-reponse_js') }}
 {% endblock %}
