@@ -13,6 +13,9 @@
 	{% else %}
 
 		{% if quizAvailable %}
+
+			<form>
+
 			{% set numQuestion = 0 %}
 			{% for question in quizAvecQuestionsReponses.questions %}
 				{% set numQuestion = numQuestion + 1 %}
@@ -28,7 +31,7 @@
 					<div class="card-body">
 						{% for reponse in question.reponses %}
 							<div class="custom-control custom-radio py-2">
-								<input type="radio" id="{{ reponse.id }}" name="quesion{{ question.id }}" class="custom-control-input">
+								<input type="radio" id="{{ reponse.id }}" name="quesion{{ question.id }}" value="{{ reponse.id }}" class="custom-control-input">
 								<label class="custom-control-label" for="{{ reponse.id }}">{{ reponse.intitule }}</label>
 							</div>
 						{% endfor %}
@@ -38,8 +41,10 @@
 			{% endfor %}
 
 			<div class="text-center">
-				<button class="btn btn-primary btn-lg" type="submit">Valider le questionnaire</button>
+				<button class="btn btn-primary btn-lg">Valider le questionnaire</button>
 			</div>
+
+			</form>
 		{% else %}
 			{# quiz plus disponible #}
 			<div class="alert alert-secondary my-3" role="alert">
@@ -57,5 +62,5 @@
 {% endblock %}
 
 {% block javascripts %}
-	{{ encore_entry_script_tags('acces-quiz_js') }}
+	{{ encore_entry_script_tags('submit-reponse_js') }}
 {% endblock %}
