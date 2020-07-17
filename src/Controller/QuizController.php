@@ -402,10 +402,10 @@ class QuizController extends AbstractController
         $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
 
         //resultat du quiz
-        $resultats = $resultatRepository->findBy(['quiz' => $idQuiz]);
+        $resultatsUnQuiz = $resultatRepository->findBy(['quiz' => $idQuiz]);
 
         //nombre de fois qu'une quiz a ete fait
-        $nbResultats = count($resultats);
+        $nbResultats = count($resultatsUnQuiz);
 
         if (empty($nbResultats)) {
             return $this->render('quiz/stat_quiz.html.twig', [
@@ -415,7 +415,7 @@ class QuizController extends AbstractController
 
         //recup tous les scores
         $arrayScore = array();
-        foreach ($resultats as $resultat) {
+        foreach ($resultatsUnQuiz as $resultat) {
             array_push($arrayScore, $resultat->getScore());
         }
 
@@ -427,7 +427,6 @@ class QuizController extends AbstractController
         sort($arrayScore);
         $indexScore = ceil(($nbResultats + 1) / 2);
         $mediane = $arrayScore[$indexScore-1]; //-1 car ca comment à 1 et pas 0
-
 
         return $this->render('quiz/stat_quiz.html.twig', [
             'leQuiz' => $quiz,
