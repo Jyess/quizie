@@ -15,6 +15,7 @@ use App\Form\ResultatType;
 use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
 use App\Repository\ReponseRepository;
+use App\Repository\ResultatRepository;
 use App\Service\QuizService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -353,6 +354,10 @@ class QuizController extends AbstractController
      */
     public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository,ReponseRepository $reponseRepository)
     {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+                throw new AccessDeniedException();
+        }
+
         $resultat = new Resultat();
         $quiz = $quizRepository->find($idQuiz);
         $resultat->setQuiz($quiz);
@@ -380,5 +385,56 @@ class QuizController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['data' => 'ok'], 200);
+    }
+
+    /**
+     * @Route("/stat/{idQuiz}", name="quiz_voirStat")
+     * @param Request $request
+     */
+    public function voirStat($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    {
+        //vérifie que le user connecté est bien le créateur
+        if (!$quizService->isOwner($idQuiz)) {
+            throw new AccessDeniedException();
+        }
+
+        $quiz = $quizRepository->find($idQuiz);
+        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
+
+        //resultat du quiz
+        $resultats = $resultatRepository->findBy(['quiz' => $idQuiz]);
+
+        //nombre de fois qu'une quiz a ete fait
+        $nbResultats = count($resultats);
+
+        if (empty($nbResultats)) {
+            return $this->render('quiz/stat_quiz.html.twig', [
+                'nbResultats' => $nbResultats
+            ]);
+        }
+
+        //recup tous les scores
+        $arrayScore = array();
+        foreach ($resultats as $resultat) {
+            array_push($arrayScore, $resultat->getScore());
+        }
+
+        //calcul du score moyen
+        $arrayScore = array_filter($arrayScore); //verif chaque valeur
+        $scoreMoyen = round(array_sum($arrayScore)/$nbResultats,1);
+
+        //calcul de la mediane
+        sort($arrayScore);
+        $indexScore = ceil(($nbResultats + 1) / 2);
+        $mediane = $arrayScore[$indexScore-1]; //-1 car ca comment à 1 et pas 0
+
+
+        return $this->render('quiz/stat_quiz.html.twig', [
+            'leQuiz' => $quiz,
+            'quizAvecQuestionsReponses' => $quizAvecQuestionsReponses,
+            'nbResultats' => $nbResultats,
+            'scoreMoyen' => $scoreMoyen,
+            'mediane' => $mediane
+        ]);
     }
 }
