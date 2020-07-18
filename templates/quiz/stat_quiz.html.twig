@@ -62,14 +62,26 @@
 
 				<div class="card-body">
 					<div class="mb-3 float-right">
-						<span class="badge badge-success">{{ question.nbPointsBonneReponse }}
+						<span class="badge badge-pill badge-success">{{ question.nbPointsBonneReponse }}
 							points</span>
-						<span class="badge badge-danger">{{ question.nbPointsMauvaiseReponse }}
+						<span class="badge badge-pill badge-danger">{{ question.nbPointsMauvaiseReponse }}
 							points</span>
 					</div>
 
 					{% for reponse in question.reponses %}
-						<p class="card-text {% if reponse.vraiFaux %}text-success{% else %}text-danger{% endif %}">{{ reponse.intitule }}</p>
+						<div class="card-text my-2 {% if reponse.vraiFaux %}text-success{% else %}text-danger{% endif %}">
+							{{ reponse.intitule }}
+
+							{% for reponseChoisie in nbReponseQuiz %}
+								{% if reponseChoisie["id"] == reponse.id %}
+									<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
+										(réponse choisie
+										<span class="font-weight-bold">{{ reponseChoisie[1] }}</span>
+										fois)
+									</span>
+								{% endif %}
+							{% endfor %}
+						</div>
 					{% endfor %}
 				</div>
 			</div>

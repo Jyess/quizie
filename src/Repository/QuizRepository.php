@@ -47,7 +47,7 @@ class QuizRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Quiz[] Returns an array of Quiz objects
+     * @return Quiz Returns an array of Quiz objects
      */
     public function findQuestionsWithAnswers($idQuiz)
     {

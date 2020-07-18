@@ -19,22 +19,20 @@ class ResultatRepository extends ServiceEntityRepository
         parent::__construct($registry, Resultat::class);
     }
 
-    // /**
-    //  * @return Resultat[] Returns an array of Resultat objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Resultat[] Returns an array of Resultat objects
+     */
+    public function nbReponsesParQuiz($idQuiz)
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('res')
+            ->select('rep.id', 'count(rep.id)')
+            ->join('res.reponses', 'rep')
+            ->andWhere('res.quiz = :idQuiz')
+            ->groupBy('rep.id')
+            ->setParameter('idQuiz', $idQuiz)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Resultat

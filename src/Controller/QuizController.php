@@ -356,21 +356,36 @@ class QuizController extends AbstractController
      */
     public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository, ReponseRepository $reponseRepository)
     {
+        $resultat = new Resultat();
+        $quiz = $quizRepository->find($idQuiz);
+
         if (!$request->isMethod(Request::METHOD_POST)) {
             throw new AccessDeniedException();
         }
 
-        $resultat = new Resultat();
-        $quiz = $quizRepository->find($idQuiz);
+        if (!$quiz) {
+            throw new NotFoundHttpException();
+        }
+
         $resultat->setQuiz($quiz);
 
         $score = 0;
         $questionsReponsesUser = $request->request->all();
 
         foreach ($questionsReponsesUser as $idQuestion => $idReponse) {
-            $question = $questionRepository->find($idQuestion);
 
+            $question = $questionRepository->find($idQuestion);
             $reponse = $reponseRepository->find($idReponse);
+
+            //verif si la question appartient bien au quiz
+            $questionBelongToQuiz = $questionRepository->findBy(['id' => $idQuestion, 'quiz' => $quiz]);
+            //verif si la reponse appartient a la quesiton
+            $reponseBelongToQuestion = $reponseRepository->findBy(['id' => $idReponse, 'question' => $question]);
+
+            if (empty($questionBelongToQuiz) || empty($reponseBelongToQuestion)) {
+                throw new AccessDeniedException();
+            }
+
             $resultat->addReponse($reponse);
 
             if ($reponse->getVraiFaux()) {
@@ -400,20 +415,24 @@ class QuizController extends AbstractController
             throw new AccessDeniedException();
         }
 
-        $quiz = $quizRepository->find($idQuiz);
-        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
-
         //resultat du quiz
         $resultatsUnQuiz = $resultatRepository->findBy(['quiz' => $idQuiz]);
 
         //nombre de fois qu'une quiz a ete fait
         $nbResultats = count($resultatsUnQuiz);
 
+        //si aucun resultat, on va direct sur la page des stat
         if (empty($nbResultats)) {
             return $this->render('quiz/stat_quiz.html.twig', [
                 'nbResultats' => $nbResultats
             ]);
         }
+
+        //recup les questions reponses
+        $quiz = $quizRepository->find($idQuiz);
+        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
+
+        $nbReponsesParQuiz = $resultatRepository->nbReponsesParQuiz($idQuiz);
 
         //recup tous les scores
         $arrayScore = array();
@@ -435,7 +454,8 @@ class QuizController extends AbstractController
             'quizAvecQuestionsReponses' => $quizAvecQuestionsReponses,
             'nbResultats' => $nbResultats,
             'scoreMoyen' => $scoreMoyen,
-            'mediane' => $mediane
+            'mediane' => $mediane,
+            'nbReponseQuiz' => $nbReponsesParQuiz
         ]);
     }
 }
