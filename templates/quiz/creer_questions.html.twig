@@ -1,72 +1,78 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ajouter des questions{% endblock %}
+{% block title %}Ajouter des questions
+{% endblock %}
 
-   {% block stylesheets %}
-       {{ parent() }}
-       {{ encore_entry_link_tags('questions_css') }}
-   {% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('questions_css') }}
+{% endblock %}
 
 {% block body %}
-    <div id="info-quiz">
-        <h1 class="title text-center mb-4">Ajoutez des questions à votre quiz</h1>
+	<div id="info-quiz">
+		<h1 class="title text-center mb-4">Ajoutez des questions à votre quiz</h1>
 
-        <div class="row">
-            <div class="col-lg my-2 my-lg-0">
-                <div class="text-center">
-                    <span class="font-weight-bold">Nom du quiz</span> <br>
-                    {{ quiz.intitule|length > 20 ? quiz.intitule|slice(0,20) ~ '...' : quiz.intitule }}
-                </div>
-            </div>
+		<div class="row">
+			<div class="col-lg my-2 my-lg-0">
+				<div class="text-center">
+					<span class="font-weight-bold">Nom du quiz</span>
+					<br>
+					{{ quiz.intitule|trimLong }}
+				</div>
+			</div>
 
-            {% if quiz.plageHoraireDebut %}
-            <div class="col-lg my-2 my-lg-0">
-                <div class="text-center">
-                    <span class="font-weight-bold">Plage horaire de début</span> <br>
-                    {{ quiz.plageHoraireDebut|date("d/m/Y G:i", false) }}
-                </div>
-            </div>
-            <div class="col-lg my-2 my-lg-0">
-                <div class="text-center">
-                    <span class="font-weight-bold">Plage horaire de fin</span> <br>
-                    {{ quiz.plageHoraireFin|date("d/m/Y G:i", false) }}
-                </div>
-            </div>
+			{% if quiz.plageHoraireDebut %}
+				<div class="col-lg my-2 my-lg-0">
+					<div class="text-center">
+						<span class="font-weight-bold">Plage horaire de début</span>
+						<br>
+						{{ quiz.plageHoraireDebut|date("d/m/Y G:i", false) }}
+					</div>
+				</div>
+				<div class="col-lg my-2 my-lg-0">
+					<div class="text-center">
+						<span class="font-weight-bold">Plage horaire de fin</span>
+						<br>
+						{{ quiz.plageHoraireFin|date("d/m/Y G:i", false) }}
+					</div>
+				</div>
 
-            <div class="col-lg my-2 my-lg-0">
-                <div class="text-center">
-                    <span class="font-weight-bold">Statut</span> <br>
-                    {% if isAvailable %}
-                        Disponible
-                    {% else %}
-                        Plus disponible
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
+				<div class="col-lg my-2 my-lg-0">
+					<div class="text-center">
+						<span class="font-weight-bold">Statut</span>
+						<br>
+						{% if isAvailable %}
+							Disponible
+						{% else %}
+							Plus disponible
+						{% endif %}
+					</div>
+				</div>
+			{% endif %}
 
-            {% if quiz.cleAcces %}
-            <div class="col-lg my-2 my-lg-0">
-                <div class="text-center">
-                    <span class="font-weight-bold">Clé d'accès</span> <br>
-                    <span class="text-primary code">{{ quiz.cleAcces }}</span>
-                    <i id="copy" class="far fa-copy my-auto" data-container="body" data-toggle="popover" data-placement="bottom" data-content="La clé a été copiée dans le presse papier."></i>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
+			{% if quiz.cleAcces %}
+				<div class="col-lg my-2 my-lg-0">
+					<div class="text-center">
+						<span class="font-weight-bold">Clé d'accès</span>
+						<br>
+						<span class="text-primary code">{{ quiz.cleAcces }}</span>
+						<i id="copy" class="far fa-copy my-auto" data-container="body" data-toggle="popover" data-placement="bottom" data-content="La clé a été copiée dans le presse papier."></i>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
 
-    <div id="questionsContainer"></div>
+	<div id="questionsContainer"></div>
 
-    <div class="col text-center mt-4">
-        <button id="addQuestion" class="btn btn-primary addButton">Ajouter une question</button>
-    </div>
+	<div class="col text-center mt-4">
+		<button id="addQuestion" class="btn btn-primary addButton">Ajouter une question</button>
+	</div>
 
-    <div class="js-quiz-id" data-quiz-id="{{ quiz.id }}"></div>
+	<div class="js-quiz-id" data-quiz-id="{{ quiz.id }}"></div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('questions_js') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('questions_js') }}
 {% endblock %}

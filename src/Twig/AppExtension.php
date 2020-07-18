@@ -11,6 +11,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('shuffle', [$this, 'shuffleArray']),
+            new TwigFilter('trimLong', [$this, 'trimLongText']),
         ];
     }
 
@@ -18,5 +19,10 @@ class AppExtension extends AbstractExtension
     {
         shuffle($array);
         return $array;
+    }
+
+    public function trimLongText($longText, $max = 20)
+    {
+        return strlen($longText) > $max ? substr($longText, 0, $max) . '...' : $longText;
     }
 }

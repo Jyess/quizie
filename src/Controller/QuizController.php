@@ -330,6 +330,10 @@ class QuizController extends AbstractController
      */
     public function deleteQuiz($idQuiz, QuizRepository $quizRepository, QuizService $quizService)
     {
+        if (!$quizService->exist($idQuiz)) {
+            throw new NotFoundHttpException();
+        }
+
         //vérifie que le user connecté est bien le créateur
         if (!$quizService->isOwner($idQuiz)) {
             throw new AccessDeniedException();
@@ -343,19 +347,17 @@ class QuizController extends AbstractController
 
         $mesQuiz = $quizRepository->findBy(['utilisateurCreateur' => $this->getUser()]);
 
-        return $this->render('quiz/tous_mes_quiz.html.twig', [
-            'mesQuiz' => $mesQuiz
-        ]);
+        return $this->redirectToRoute('quiz_voirTousMesQuiz');
     }
 
     /**
      * @Route("/verif-quiz/{idQuiz}", name="quiz_verifQuiz")
      * @param Request $request
      */
-    public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository,ReponseRepository $reponseRepository)
+    public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository, ReponseRepository $reponseRepository)
     {
         if (!$request->isMethod(Request::METHOD_POST)) {
-                throw new AccessDeniedException();
+            throw new AccessDeniedException();
         }
 
         $resultat = new Resultat();
@@ -421,12 +423,12 @@ class QuizController extends AbstractController
 
         //calcul du score moyen
         $arrayScore = array_filter($arrayScore); //verif chaque valeur
-        $scoreMoyen = round(array_sum($arrayScore)/$nbResultats,1);
+        $scoreMoyen = round(array_sum($arrayScore) / $nbResultats, 1);
 
         //calcul de la mediane
         sort($arrayScore);
         $indexScore = ceil(($nbResultats + 1) / 2);
-        $mediane = $arrayScore[$indexScore-1]; //-1 car ca comment à 1 et pas 0
+        $mediane = $arrayScore[$indexScore - 1]; //-1 car ca comment à 1 et pas 0
 
         return $this->render('quiz/stat_quiz.html.twig', [
             'leQuiz' => $quiz,

@@ -10,33 +10,43 @@
 		<div class="row">
 			<div class="col-lg my-2 my-lg-0">
 				<div class="text-center">
-					<span class="font-weight-bold">Nom du quiz</span> <br>
-					{{ leQuiz.intitule|length > 20 ? leQuiz.intitule|slice(0,20) ~ '...' : leQuiz.intitule }}
+					<span class="font-weight-bold">Nom du quiz</span>
+					<br>
+					{{ leQuiz.intitule|trimLong }}
 				</div>
 			</div>
 			<div class="col-lg my-2 my-lg-0">
 				<div class="text-center">
-					<span class="font-weight-bold">Nombre de résultats</span> <br>
+					<span class="font-weight-bold">Nombre de résultats</span>
+					<br>
 					{{ nbResultats }}
 				</div>
 			</div>
 			<div class="col-lg my-2 my-lg-0">
 				<div class="text-center">
-					<span class="font-weight-bold">Score moyen</span> <br>
-					{{ scoreMoyen }} points
+					<span class="font-weight-bold">Score moyen</span>
+					<br>
+					{{ scoreMoyen }}
+					points
 				</div>
 			</div>
 			<div class="col-lg my-2 my-lg-0">
 				<div class="text-center">
-					<span class="font-weight-bold">Médiane des scores</span> <br>
-					{{ mediane }} points
+					<span class="font-weight-bold">Médiane des scores</span>
+					<br>
+					{{ mediane }}
+					points
 				</div>
 			</div>
 		</div>
 
 		<div class="text-center my-3">
-			<a class="btn btn-info mx-3 my-lg my-2" href="#" role="button">Exporter les résultats <span class="badge badge-light">Format CSV</span></a>
-			<a class="btn btn-secondary mx-3 my-lg my-2" href="#" role="button">Exporter les questions <span class="badge badge-light">Format CSV</span></a>
+			<a class="btn btn-info mx-3 my-lg my-2" href="#" role="button">Exporter les résultats
+				<span class="badge badge-light">Format CSV</span>
+			</a>
+			<a class="btn btn-secondary mx-3 my-lg my-2" href="#" role="button">Exporter les questions
+				<span class="badge badge-light">Format CSV</span>
+			</a>
 		</div>
 
 		{% set numQuestion = 0 %}
@@ -52,8 +62,10 @@
 
 				<div class="card-body">
 					<div class="mb-3 float-right">
-						<span class="badge badge-success">{{ question.nbPointsBonneReponse }} points</span>
-						<span class="badge badge-danger">{{ question.nbPointsMauvaiseReponse }} points</span>
+						<span class="badge badge-success">{{ question.nbPointsBonneReponse }}
+							points</span>
+						<span class="badge badge-danger">{{ question.nbPointsMauvaiseReponse }}
+							points</span>
 					</div>
 
 					{% for reponse in question.reponses %}
@@ -64,7 +76,8 @@
 		{% endfor %}
 	{% else %}
 		<div class="alert alert-warning mx-auto text-center col-lg-6" role="alert">
-			<span class="font-weight-bold">Personne</span> n'a encore essayé votre quiz ! :(
+			<span class="font-weight-bold">Personne</span>
+			n'a encore essayé votre quiz ! :(
 		</div>
 	{% endif %}
 {% endblock %}

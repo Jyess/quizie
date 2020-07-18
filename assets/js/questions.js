@@ -173,6 +173,8 @@ function ajoutFormulaireQuestion() {
 
       //scroll vers le bas pour afficher le bloc question
       $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+
+      $("#addQuestion").attr("disabled", false);
     })
     .fail(function (error) {
       alert("Une erreur est survenue. Merci de réessayer.");
@@ -204,10 +206,10 @@ function afficherQuestionsDejaCreees($quizId) {
               //ajoute les formulaires des reponses
               boutonAjoutReponsesEtFormulaires("#question" + $idQuestion);
 
-              $formHolder.find("button.saveQuestion").prop("disabled", true);
-              $formHolder.find("button.editQuestion").prop("disabled", false);
-              $formHolder.find("button.deleteQuestion").prop("disabled", false);
-              $formHolder.find("input, textarea").prop("disabled", true);
+              $formHolder.find("button.saveQuestion").attr("disabled", true);
+              $formHolder.find("button.editQuestion").attr("disabled", false);
+              $formHolder.find("button.deleteQuestion").attr("disabled", false);
+              $formHolder.find("input, textarea").attr("disabled", true);
               $formHolder.find(".reponses button").remove();
               $formHolder.find(".random").remove();
             },
@@ -256,6 +258,7 @@ $(document).ready(function () {
 
   // Listener sur le bouton "Ajouter une question" qui ajoute un nouveau formulaire question
   $(document).on("click", "#addQuestion", function (e) {
+    $(this).attr("disabled", true);
     ajoutFormulaireQuestion();
   });
 
@@ -278,6 +281,7 @@ $(document).ready(function () {
 
     let $questionHolder = $(e.target).parent();
     let $currentButton = $(document.activeElement);
+    $currentButton.attr("disabled", true);
 
     // l'element fomrmulaire actuel
     let $submittedForm = $currentButton.closest("form");
@@ -377,6 +381,7 @@ $(document).ready(function () {
 
     // affiche une icone de chargement
     $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+    $currentButton.attr("disabled", true);
 
     //id du quiz
     let $quizIdHolder = $(".js-quiz-id");

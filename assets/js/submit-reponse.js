@@ -2,12 +2,14 @@ const $ = require("jquery");
 
 $(document).one("submit", "form", function (e) {
   e.preventDefault();
-  // e.stopImmediatePropagation(); //aucun autre submit est appelé mais form submit twice sans ca
+  e.stopImmediatePropagation(); //aucun autre submit est appelé mais form submit twice sans ca
 
   let $quizIdHolder = $(".js-quiz-id");
   let $idQuiz = $quizIdHolder.data("quizId");
 
   let $currentButton = $(document.activeElement);
+  $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+  $currentButton.attr("disabled", true);
 
   // le formulaire
   let $submittedForm = $currentButton.closest("form");
@@ -22,7 +24,7 @@ $(document).one("submit", "form", function (e) {
       if (data.error) {
         console.log("error euh voila");
       } else {
-        $("label").prop("disabled", true);
+        $("input").attr("disabled", true);
         $currentButton.remove();
         $("#quizSubmitted").append(
           '<div class="alert alert-success" role="alert">Vos réponses ont été enregistrées !</div>' +

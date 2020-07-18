@@ -9,7 +9,7 @@
 	<div class="list-group text-break">
 		{% for quiz in lesQuiz %}
 			<a class="list-group-item list-group-item-action" href="{{ path('quiz_afficherQuiz', {'idQuiz' : quiz.id}) }}">
-				{{ quiz.intitule }}
+				{{ quiz.intitule|trimLong(40) }}
 
 				<span class="font-italic float-right">
 					Créé par
@@ -18,6 +18,12 @@
 			</a>
 		{% endfor %}
 	</div>
+
+	{% if lesQuiz is empty %}
+		<div class="alert alert-warning col-lg-6 mx-auto mt-3" role="alert">
+			<div class="text-center px-2">Aucun quiz n'est disponible pour le moment.</div>
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block javascripts %}

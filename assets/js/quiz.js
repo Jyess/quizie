@@ -25,4 +25,13 @@ $(document).ready(function () {
   $(".supprimerQuiz").on("click", function () {
     return confirm("Êtes-vous sûr de vouloir supprimer ce quiz ?");
   });
+
+  $(document).one("click", "#quiz_envoyer", function (e) {
+    let $currentButton = $(document.activeElement);
+    $currentButton.attr("disabled", true);
+    $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
+
+    let $submittedForm = $currentButton.closest("form");
+    $submittedForm.submit();
+  });
 });
