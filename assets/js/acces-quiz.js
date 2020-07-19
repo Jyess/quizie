@@ -3,7 +3,9 @@ const $ = require("jquery");
 $(document).on("submit", "form", function (e) {
   e.preventDefault();
 
-  let $currentButton = $(document.activeElement);
+  let $currentButton = $("#verifCode");
+
+  $currentButton.attr("disabled", true);
 
   // le formulaire
   let $submittedForm = $currentButton.closest("form");
@@ -32,9 +34,12 @@ $(document).on("submit", "form", function (e) {
       } else {
         $("#content").html(data);
       }
+
+      $currentButton.attr("disabled", false);
     },
   }).fail(function (error) {
     console.log("error");
     $submittedForm.find("button[type='submit'] svg").remove();
+    $currentButton.attr("disabled", false);
   });
 });

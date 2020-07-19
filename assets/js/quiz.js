@@ -28,7 +28,7 @@ $(document).ready(function () {
   });
 
   $(document).one("click", "#quiz_envoyer", function (e) {
-    let $currentButton = $(document.activeElement);
+    let $currentButton = $("#quiz_envoyer");
     $currentButton.attr("disabled", true);
     $currentButton.append('<i class="ml-2 fas fa-circle-notch fa-spin">');
 
