@@ -5,6 +5,28 @@
 {% endblock %}
 
 {% block body %}
-	<h1 class="title text-center mt-3">Bienvenue sur Quizie !</h1>
-	créer un quiz maintenant bouton
+	<div class="jumbotron">
+		<h1 class="display-4">Bienvenue sur
+			<span class="title">Quizie</span>
+		</h1>
+		<p class="lead">Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit dignissimos, cupiditate facilis accusamus voluptate enim, illum eaque blanditiis et distinctio aliquid nisi quos dolor cum. Adipisci dolore laborum architecto vitae?</p>
+		<hr class="my-4">
+		<p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempora magnam nesciunt amet omnis.</p>
+		<a class="btn btn-secondary btn-lg" href="{{ path('quiz_creerQuiz') }}" role="button">Créer un quiz maintenant</a>
+	</div>
+
+	<div class="card-deck">
+		{% for i in 0..2 %}
+			<div class="card">
+				<img src="http://placehold.jp/200x200.png" class="card-img-top" alt="...">
+				<div class="card-body">
+					<h5 class="card-title">Card title</h5>
+					<p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+					<p class="card-text">
+						<small class="text-muted">Last updated 3 mins ago</small>
+					</p>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
 {% endblock %}

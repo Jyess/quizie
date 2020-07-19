@@ -1,82 +1,97 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta
-            name="theme-color" content="#036eaf">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<meta
+		name="theme-color" content="#036eaf">
 
-    {# favicon #}
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.ico') }}">
+		{# favicon #}
+		<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.ico') }}">
 
-    <title>Quizie -
-        {% block title %}{% endblock %}
-    </title>
-    {% block stylesheets %}
-        {{ encore_entry_link_tags('main_css') }}
-    {% endblock %}
-</head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary text-white">
-        <div class="container">
-            <a class="navbar-brand title" id="logo" href="/">Quizie</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+		<title>Quizie -
+			{% block title %}{% endblock %}
+		</title>
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('main_css') }}
+		{% endblock %}
+	</head>
+	<body>
+		<header>
+			<nav class="navbar navbar-expand-lg navbar-dark bg-primary text-white">
+				<div class="container">
+					<a class="navbar-brand title" id="logo" href="/">Quizie</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item {% if app.request.attributes.get('_route') == 'accueil_index' %}active{% endif %}">
-                        <a class="nav-link" href="{{ path("accueil_index") }}">Accueil</a>
-                    </li>
-                    <li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_tousLesQuiz' %}active{% endif %}">
-                        <a class="nav-link" href="{{ path("quiz_tousLesQuiz") }}">Voir les quiz</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    {% if app.user %}
-                        <li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_creerQuiz' %}active{% endif %}">
-                            <a class="nav-link" href="{{ path("quiz_creerQuiz") }}">Créer un quiz</a>
-                        </li>
+					<div class="collapse navbar-collapse" id="navbarSupportedContent">
+						<ul class="navbar-nav mr-auto">
+							<li class="nav-item {% if app.request.attributes.get('_route') == 'accueil_index' %}active{% endif %}">
+								<a class="nav-link" href="{{ path("accueil_index") }}">Accueil</a>
+							</li>
+							<li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_tousLesQuiz' %}active{% endif %}">
+								<a class="nav-link" href="{{ path("quiz_tousLesQuiz") }}">Voir les quiz</a>
+							</li>
+						</ul>
+						<ul class="navbar-nav ml-auto">
+							{% if app.user %}
+								<li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_creerQuiz' %}active{% endif %}">
+									<a class="nav-link" href="{{ path("quiz_creerQuiz") }}">Créer un quiz</a>
+								</li>
 
-                        <li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_voirTousMesQuiz' %}active{% endif %}">
-                            <a class="nav-link" href="{{ path("quiz_voirTousMesQuiz") }}">Mes quiz</a>
-                        </li>
-                    {% endif %}
+								<li class="nav-item {% if app.request.attributes.get('_route') == 'quiz_voirTousMesQuiz' %}active{% endif %}">
+									<a class="nav-link" href="{{ path("quiz_voirTousMesQuiz") }}">Mes quiz</a>
+								</li>
+							{% endif %}
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-user-circle account"></i>
-                        </a>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<i class="fa fa-user-circle account"></i>
+								</a>
 
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            {% if not app.user %}
-                                <a class="dropdown-item" href="{{ path("security_connexion") }}">Se connecter</a>
-                            {% else %}
-                                <a class="dropdown-item" href="{{ path("security_mesInfos") }}">Mes infos</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{ path("security_deconnexion") }}">Se déconnecter</a>
-                            {% endif %}
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
+								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+									{% if not app.user %}
+										<a class="dropdown-item" href="{{ path("security_connexion") }}">Se connecter</a>
+									{% else %}
+										<a class="dropdown-item" href="{{ path("security_mesInfos") }}">Mes infos</a>
+										<div class="dropdown-divider"></div>
+										<a class="dropdown-item" href="{{ path("security_deconnexion") }}">Se déconnecter</a>
+									{% endif %}
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</header>
 
-<div class="container">
-    <div id="content">
-        {% block body %}{% endblock %}
-    </div>
-</div>
+		<main role="main" class="container pb-4">
+			<div class="container">
+				<div id="content"> {% block body %}{% endblock %}
+					</div>
+				</div>
+			</main>
 
-{% block javascripts %}
-    {{ encore_entry_script_tags('main_js') }}
-{% endblock %}
-</body>
-</html>
+			<footer class="footer">
+				<div class="container">
+					<h2 class="text-center my-3 title">Quizie</h2>
+
+					<div class="social row col-6 col-lg-2 mx-auto justify-content-between">
+						<i class="fab fa-facebook"></i>
+						<i class="fab fa-instagram"></i>
+						<i class="fab fa-twitter"></i>
+					</div>
+
+					<p class="text-center pt-3">
+						&copy; 2020 Quizie - Tous droits réservés
+					</p>
+				</div>
+			</footer>
+
+			{% block javascripts %}
+				{{ encore_entry_script_tags('main_js') }}
+			{% endblock %}
+		</body>
+	</html>
