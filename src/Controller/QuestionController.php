@@ -72,7 +72,7 @@ class QuestionController extends AbstractController
             return new JsonResponse(['idQuestion' => $uneQuestion->getId()], 201);
         }
 
-        return $this->render('quiz/form_question.html.twig', [
+        return $this->render('question/form_question.html.twig', [
             'questionFormulaire' => $questionForm->createView(),
             'question' => $uneQuestion
         ]);

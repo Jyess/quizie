@@ -84,7 +84,7 @@ class QuizController extends AbstractController
 
             $isAvailable = $quizService->verifPlageHoraire($idQuiz, $quizRepository);
 
-            return $this->render('quiz/creer_questions.html.twig', [
+            return $this->render('question/creer_questions.html.twig', [
                 'quiz' => $quiz,
                 'questionFormulaire' => $questionForm->createView(),
                 'isAvailable' => $isAvailable
