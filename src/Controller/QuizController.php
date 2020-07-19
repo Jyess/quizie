@@ -10,17 +10,11 @@ use App\Form\DemandeCleAccesType;
 use App\Form\QuestionnaireType;
 use App\Form\QuizType;
 use App\Form\QuestionType;
-use App\Form\ReponseType;
-use App\Form\ResultatType;
 use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
 use App\Repository\ReponseRepository;
 use App\Repository\ResultatRepository;
 use App\Service\QuizService;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
-use http\QueryString;
-use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,12 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Validator\Constraints\Json;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class QuizController extends AbstractController
 {
@@ -205,123 +193,6 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/delete-question/{idQuiz}/{idQuestion}", name="quiz_deleteQuestion")
-     * @param $idQuiz
-     * @param $idQuestion
-     * @param Request $request
-     * @param QuestionRepository $questionRepository
-     * @param QuizService $quizService
-     * @return JsonResponse
-     */
-    public function deleteQuestion($idQuiz, $idQuestion, Request $request, QuestionRepository $questionRepository, QuizService $quizService)
-    {
-        if (!$quizService->exist($idQuiz)) {
-            throw new NotFoundHttpException();
-        }
-
-        //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_GET) && !$quizService->isOwner($idQuiz, $idQuestion)) {
-            throw new AccessDeniedException();
-        }
-
-        $question = $questionRepository->find($idQuestion);
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($question);
-        $entityManager->flush();
-
-        return new JsonResponse(['code' => '200'], 200);
-    }
-
-    /**
-     * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
-     * @param $idQuiz
-     * @param Request $request
-     * @param QuestionRepository $questionRepository
-     * @param QuizRepository $quizRepository
-     * @param QuizService $quizService
-     * @return JsonResponse
-     */
-    public function recupererQuestionsDejaCreees($idQuiz, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository, QuizService $quizService)
-    {
-        //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_POST) && !$quizService->isOwner($idQuiz)) {
-            throw new AccessDeniedException();
-        }
-
-        $quiz = $quizRepository->find($idQuiz);
-        $questions = $questionRepository->findBy(["quiz" => $quiz]);
-
-        $idsQuestions = [];
-        foreach ($questions as $question) {
-            $idsQuestions[] = $question->getId();
-        }
-
-        return new JsonResponse(['idsQuestions' => $idsQuestions], 201);
-    }
-
-    /**
-     * Modifie ou supprime une question.
-     *
-     * @Route("/manage-question/{idQuiz}/{idQuestion}", name="quiz_manageQuestion", options = { "expose" = true }, defaults={"idQuestion"=null})
-     * @param $idQuiz
-     * @param $idQuestion
-     * @param Request $request
-     * @param QuizRepository $quizRepository
-     * @param QuestionRepository $questionRepository
-     * @param QuizService $quizService
-     * @return JsonResponse|Response
-     */
-    public function manageQuestion($idQuiz, $idQuestion, Request $request, QuizRepository $quizRepository, QuestionRepository $questionRepository, QuizService $quizService)
-    {
-        //vérifie que le user connecté est bien le créateur
-        if (!$request->isMethod(Request::METHOD_POST) || !$quizService->isOwner($idQuiz, $idQuestion)) {
-            throw new AccessDeniedException();
-        }
-
-        //reponses de la question dans la bdd
-        $reponsesBD = new ArrayCollection();
-
-        $uneQuestion = new Question();
-        $quiz = $quizRepository->find($idQuiz);
-
-        if ($idQuestion) {
-            $uneQuestion = $questionRepository->find($idQuestion);
-
-            foreach ($uneQuestion->getReponses() as $reponse) {
-                $reponsesBD->add($reponse);
-            }
-        }
-
-        $questionForm = $this->createForm(QuestionType::class, $uneQuestion);
-        $questionForm->handleRequest($request);
-
-        if ($questionForm->isSubmitted() && $questionForm->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $uneQuestion->setQuiz($quiz);
-
-            foreach ($reponsesBD as $reponse) {
-                $reponse->setQuestion($uneQuestion);
-                if (!$uneQuestion->getReponses()->contains($reponse)) {
-                    $reponse->setQuestion(null);
-                    $uneQuestion->removeReponse($reponse);
-                    $entityManager->persist($reponse);
-                }
-            }
-
-            $entityManager->persist($uneQuestion);
-            $entityManager->flush();
-
-            return new JsonResponse(['idQuestion' => $uneQuestion->getId()], 201);
-        }
-
-        return $this->render('quiz/form_question.html.twig', [
-            'questionFormulaire' => $questionForm->createView(),
-            'question' => $uneQuestion
-        ]);
-    }
-
-    /**
      * @Route("/delete-quiz/{idQuiz}", name="quiz_deleteQuiz")
      * @param $idQuiz
      * @param QuizRepository $quizRepository
@@ -433,6 +304,7 @@ class QuizController extends AbstractController
         $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
 
         $nbReponsesParQuiz = $resultatRepository->nbReponsesParQuiz($idQuiz);
+        $idsReponsesRepondues = $resultatRepository->getIdsReponsesRepondues($idQuiz);
 
         //recup tous les scores
         $arrayScore = array();
@@ -455,7 +327,8 @@ class QuizController extends AbstractController
             'nbResultats' => $nbResultats,
             'scoreMoyen' => $scoreMoyen,
             'mediane' => $mediane,
-            'nbReponseQuiz' => $nbReponsesParQuiz
+            'nbReponseQuiz' => $nbReponsesParQuiz,
+            'idsReponsesRepondues' => $idsReponsesRepondues
         ]);
     }
 }

@@ -34,6 +34,27 @@ class ResultatRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Resultat[] Returns an array of Resultat objects
+     */
+    public function getIdsReponsesRepondues($idQuiz)
+    {
+        $query = $this->createQueryBuilder('res')
+            ->select('rep.id')
+            ->join('res.reponses', 'rep')
+            ->where('res.quiz = :idQuiz')
+            ->setParameter('idQuiz', $idQuiz)
+            ->getQuery()
+            ->getResult();
+
+        $simpleArray = array();
+        foreach ($query as $value) {
+            array_push($simpleArray, $value['id']);
+        }
+
+        return $simpleArray;
+    }
+
     /*
     public function findOneBySomeField($value): ?Resultat
     {

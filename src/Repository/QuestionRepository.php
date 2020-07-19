@@ -36,6 +36,20 @@ class QuestionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Question Returns a Question object or null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getQuestionsIds($idQuiz)
+    {
+        return $this->createQueryBuilder('question')
+            ->select('question.id')
+            ->where('question.quiz = :idQuiz')
+            ->setParameter('idQuiz', $idQuiz)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Question[] Returns an array of Question objects
     //  */

@@ -75,12 +75,20 @@
 							{% for reponseChoisie in nbReponseQuiz %}
 								{% if reponseChoisie["id"] == reponse.id %}
 									<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
-										(réponse choisie
+										(répondue
 										<span class="font-weight-bold">{{ reponseChoisie[1] }}</span>
 										fois)
 									</span>
 								{% endif %}
 							{% endfor %}
+
+							{% if reponse.id not in idsReponsesRepondues %}
+								<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
+									(répondue
+									<span class="font-weight-bold">0</span>
+									fois)
+								</span>
+							{% endif %}
 						</div>
 					{% endfor %}
 				</div>

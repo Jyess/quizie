@@ -190,7 +190,7 @@ function afficherQuestionsDejaCreees($quizId) {
         $.each(data.idsQuestions, function (index, value) {
           $.ajax({
             type: "POST",
-            url: "/manage-question/" + $quizId + "/" + value,
+            url: "/manage-question/" + $quizId + "/" + value.id,
             success: function (data, textStatus, xhr) {
               let $formHolder = $("<div class='form'></div>");
               $("#questionsContainer").append($formHolder);

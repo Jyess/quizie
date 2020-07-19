@@ -20,20 +20,20 @@ class ReponseRepository extends ServiceEntityRepository
         parent::__construct($registry, Reponse::class);
     }
 
-//     /**
-//      * @return Quiz[] Returns an array of Quiz objects
-//      */
-//     public function findQuestionsWithAnswers($idQuiz)
-//     {
-//         return $this->createQueryBuilder('reponse')
-//             ->select('quiz')
-//             ->join('reponse.question', 'question')
-//             ->join('question.quiz', 'quiz')
-//             ->andWhere('quiz.id = :idQuiz')
-//             ->setParameter('idQuiz', $idQuiz)
-//             ->getQuery()
-//             ->getResult();
-//     }
+    //     /**
+    //      * @return Quiz[] Returns an array of Quiz objects
+    //      */
+    //     public function findQuestionsWithAnswers($idQuiz)
+    //     {
+    //         return $this->createQueryBuilder('reponse')
+    //             ->select('quiz')
+    //             ->join('reponse.question', 'question')
+    //             ->join('question.quiz', 'quiz')
+    //             ->andWhere('quiz.id = :idQuiz')
+    //             ->setParameter('idQuiz', $idQuiz)
+    //             ->getQuery()
+    //             ->getResult();
+    //     }
 
     /*
     public function findOneBySomeField($value): ?Reponse
