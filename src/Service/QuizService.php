@@ -126,4 +126,35 @@ class QuizService
     {
         return $this->getQuizRepository()->find($idQuiz);
     }
+
+    /**
+     * Genère un fichier CSV.
+     */
+    public function exportCSV($data)
+    {
+        // php://output is a write-only stream that allows you 
+        // to write to the output buffer mechanism in the same way as print and echo
+        $output = fopen("php://output", "w");
+
+        fputs($output, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+
+        foreach ($data as $row) {
+            fputcsv($output, $row, ";");
+        }
+
+        fclose($output);
+    }
+
+    public function addRow($data, $rowData)
+    {
+        $row = array();
+
+        foreach ($rowData as $value) {
+            array_push($row, $value);
+        }
+
+        array_push($data, $row);
+
+        return $data;
+    }
 }

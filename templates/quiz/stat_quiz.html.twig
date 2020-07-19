@@ -41,10 +41,7 @@
 		</div>
 
 		<div class="text-center my-3">
-			<a class="btn btn-info mx-3 my-lg my-2" href="#" role="button">Exporter les résultats
-				<span class="badge badge-light">Format CSV</span>
-			</a>
-			<a class="btn btn-secondary mx-3 my-lg my-2" href="#" role="button">Exporter les questions
+			<a class="btn btn-info mx-3 my-lg my-2" href="{{ path('quiz_exportResultatsCSV', {'idQuiz' : leQuiz.id}) }}" role="button">Exporter les résultats
 				<span class="badge badge-light">Format CSV</span>
 			</a>
 		</div>

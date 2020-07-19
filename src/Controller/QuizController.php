@@ -279,7 +279,7 @@ class QuizController extends AbstractController
      * @Route("/stat/{idQuiz}", name="quiz_voirStat")
      * @param Request $request
      */
-    public function voirStat($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    public function voirStat($idQuiz, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
         //vérifie que le user connecté est bien le créateur
         if (!$quizService->isOwner($idQuiz)) {
@@ -330,5 +330,103 @@ class QuizController extends AbstractController
             'nbReponseQuiz' => $nbReponsesParQuiz,
             'idsReponsesRepondues' => $idsReponsesRepondues
         ]);
+    }
+
+    /**
+     * @Route("/export-resultats/{idQuiz}", name="quiz_exportResultatsCSV")
+     */
+    public function exportResultatsCSV($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    {
+        //vérifie que le user connecté est bien le créateur
+        if (!$quizService->isOwner($idQuiz)) {
+            throw new AccessDeniedException();
+        }
+
+        $user = $this->getUser();
+        $quiz = $quizRepository->find($idQuiz);
+
+        $filename = "Résultats du Quiz #" . $quiz->getId() . " - " . $user->getNom();
+
+        $response = new Response();
+
+        $response->headers->set('Content-type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.csv";');
+        $response->sendHeaders();
+
+        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
+        $resultatsUnQuiz = $resultatRepository->findBy(['quiz' => $idQuiz]);
+        $nbReponsesParQuiz = $resultatRepository->nbReponsesParQuiz($idQuiz);
+
+        $nbResultats = count($resultatsUnQuiz);
+
+        //recup tous les scores
+        $arrayScore = array();
+        foreach ($resultatsUnQuiz as $resultat) {
+            array_push($arrayScore, $resultat->getScore());
+        }
+
+        //calcul du score moyen
+        $arrayScore = array_filter($arrayScore); //verif chaque valeur
+        $scoreMoyen = round(array_sum($arrayScore) / $nbResultats, 1);
+
+        //calcul de la mediane
+        sort($arrayScore);
+        $indexScore = ceil(($nbResultats + 1) / 2);
+        $mediane = $arrayScore[$indexScore - 1]; //-1 car ca comment à 1 et pas 0
+
+        $data = array();
+
+        //headers quiz
+        $data = $quizService->addRow($data, array(
+            "Nom du quiz",
+            "Nombre de résultats",
+            "Score moyen",
+            "Médiane des scores"
+        ));
+
+        //data quiz
+        $data = $quizService->addRow($data, array(
+            $quiz->getIntitule(),
+            $nbResultats,
+            $scoreMoyen,
+            $mediane
+        ));
+
+        //blank row
+        $data = $quizService->addRow($data, array(""));
+
+        //headers question reponse
+        $data = $quizService->addRow($data, array(
+            "Question",
+            "Reponse juste",
+            "Reponse fausse",
+            "Reponse fausse",
+            "Reponse fausse"
+        ));
+
+        foreach ($quizAvecQuestionsReponses->getQuestions() as $question) {
+            $questionsReponses = array();
+
+            array_push($questionsReponses, $question->getIntitule());
+
+            foreach ($question->getReponses() as $reponse) {
+                $intituleReponse = $reponse->getIntitule();
+
+                foreach ($nbReponsesParQuiz as $nombre) {
+                    if ($nombre["id"] == $reponse->getId()) {
+                        $intituleReponse .= " (" . $nombre[1] . ")";
+                    }
+                }
+
+                array_push($questionsReponses, $intituleReponse);
+            }
+
+            //data question reponse
+            $data = $quizService->addRow($data, $questionsReponses);
+        }
+
+        $quizService->exportCSV($data);
+
+        return $response;
     }
 }
