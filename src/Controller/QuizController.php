@@ -15,6 +15,7 @@ use App\Repository\QuizRepository;
 use App\Repository\ReponseRepository;
 use App\Repository\ResultatRepository;
 use App\Service\QuizService;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -68,6 +69,7 @@ class QuizController extends AbstractController
      * @param QuizRepository $quizRepository
      * @param QuizService $quizService
      * @return Response
+     * @throws NonUniqueResultException
      */
     public function modifierQuiz($idQuiz, QuizRepository $quizRepository, QuizService $quizService)
     {
@@ -82,7 +84,7 @@ class QuizController extends AbstractController
             $question = new Question();
             $questionForm = $this->createForm(QuestionType::class, $question);
 
-            $isAvailable = $quizService->verifPlageHoraire($idQuiz, $quizRepository);
+            $isAvailable = $quizService->verifPlageHoraire($idQuiz);
 
             return $this->render('question/creer_questions.html.twig', [
                 'quiz' => $quiz,
@@ -130,6 +132,7 @@ class QuizController extends AbstractController
      * @param Request $request
      * @param QuizService $quizService
      * @return JsonResponse|Response
+     * @throws NonUniqueResultException
      */
     public function afficherQuiz($idQuiz, QuizRepository $quizRepository, Request $request, QuizService $quizService)
     {
@@ -198,6 +201,7 @@ class QuizController extends AbstractController
      * @param QuizRepository $quizRepository
      * @param QuizService $quizService
      * @return Response
+     * @throws NonUniqueResultException
      */
     public function deleteQuiz($idQuiz, QuizRepository $quizRepository, QuizService $quizService)
     {
@@ -216,14 +220,17 @@ class QuizController extends AbstractController
         $entityManager->remove($quizASupprimer);
         $entityManager->flush();
 
-        $mesQuiz = $quizRepository->findBy(['utilisateurCreateur' => $this->getUser()]);
-
         return $this->redirectToRoute('quiz_voirTousMesQuiz');
     }
 
     /**
      * @Route("/verif-quiz/{idQuiz}", name="quiz_verifQuiz")
      * @param Request $request
+     * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param QuestionRepository $questionRepository
+     * @param ReponseRepository $reponseRepository
+     * @return JsonResponse
      */
     public function verifQuiz(Request $request, $idQuiz, QuizRepository $quizRepository, QuestionRepository $questionRepository, ReponseRepository $reponseRepository)
     {
@@ -277,7 +284,13 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/stat/{idQuiz}", name="quiz_voirStat")
+     * @param $idQuiz
      * @param Request $request
+     * @param QuizRepository $quizRepository
+     * @param ResultatRepository $resultatRepository
+     * @param QuizService $quizService
+     * @return Response
+     * @throws NonUniqueResultException
      */
     public function voirStat($idQuiz, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
@@ -286,54 +299,36 @@ class QuizController extends AbstractController
             throw new AccessDeniedException();
         }
 
-        //resultat du quiz
-        $resultatsUnQuiz = $resultatRepository->findBy(['quiz' => $idQuiz]);
+        $quiz = $quizRepository->find($idQuiz);
 
-        //nombre de fois qu'une quiz a ete fait
-        $nbResultats = count($resultatsUnQuiz);
+        $statArray = $quizService->statData($idQuiz);
 
         //si aucun resultat, on va direct sur la page des stat
-        if (empty($nbResultats)) {
+        if (!$statArray) {
             return $this->render('quiz/stat_quiz.html.twig', [
-                'nbResultats' => $nbResultats
+                'nbResultats' => 0
             ]);
         }
 
-        //recup les questions reponses
-        $quiz = $quizRepository->find($idQuiz);
-        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
-
-        $nbReponsesParQuiz = $resultatRepository->nbReponsesParQuiz($idQuiz);
-        $idsReponsesRepondues = $resultatRepository->getIdsReponsesRepondues($idQuiz);
-
-        //recup tous les scores
-        $arrayScore = array();
-        foreach ($resultatsUnQuiz as $resultat) {
-            array_push($arrayScore, $resultat->getScore());
-        }
-
-        //calcul du score moyen
-        $arrayScore = array_filter($arrayScore); //verif chaque valeur
-        $scoreMoyen = round(array_sum($arrayScore) / $nbResultats, 1);
-
-        //calcul de la mediane
-        sort($arrayScore);
-        $indexScore = ceil(($nbResultats + 1) / 2);
-        $mediane = $arrayScore[$indexScore - 1]; //-1 car ca comment à 1 et pas 0
-
         return $this->render('quiz/stat_quiz.html.twig', [
             'leQuiz' => $quiz,
-            'quizAvecQuestionsReponses' => $quizAvecQuestionsReponses,
-            'nbResultats' => $nbResultats,
-            'scoreMoyen' => $scoreMoyen,
-            'mediane' => $mediane,
-            'nbReponseQuiz' => $nbReponsesParQuiz,
-            'idsReponsesRepondues' => $idsReponsesRepondues
+            'quizAvecQuestionsReponses' => $statArray["quizAvecQuestionsReponses"],
+            'nbResultats' => $statArray["nbResultats"],
+            'scoreMoyen' => $statArray["scoreMoyen"],
+            'mediane' => $statArray["mediane"],
+            'nbReponseQuiz' => $statArray["nbReponsesParQuiz"],
+            'idsReponsesRepondues' => $statArray["idsReponsesRepondues"]
         ]);
     }
 
     /**
      * @Route("/export-resultats/{idQuiz}", name="quiz_exportResultatsCSV")
+     * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param ResultatRepository $resultatRepository
+     * @param QuizService $quizService
+     * @return Response
+     * @throws NonUniqueResultException
      */
     public function exportResultatsCSV($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
@@ -345,6 +340,8 @@ class QuizController extends AbstractController
         $user = $this->getUser();
         $quiz = $quizRepository->find($idQuiz);
 
+        $statArray = $quizService->statData($idQuiz);
+
         $filename = "Résultats du Quiz #" . $quiz->getId() . " - " . $user->getNom();
 
         $response = new Response();
@@ -352,27 +349,6 @@ class QuizController extends AbstractController
         $response->headers->set('Content-type', 'text/csv; charset=utf-8');
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.csv";');
         $response->sendHeaders();
-
-        $quizAvecQuestionsReponses = $quizRepository->findQuestionsWithAnswers($idQuiz);
-        $resultatsUnQuiz = $resultatRepository->findBy(['quiz' => $idQuiz]);
-        $nbReponsesParQuiz = $resultatRepository->nbReponsesParQuiz($idQuiz);
-
-        $nbResultats = count($resultatsUnQuiz);
-
-        //recup tous les scores
-        $arrayScore = array();
-        foreach ($resultatsUnQuiz as $resultat) {
-            array_push($arrayScore, $resultat->getScore());
-        }
-
-        //calcul du score moyen
-        $arrayScore = array_filter($arrayScore); //verif chaque valeur
-        $scoreMoyen = round(array_sum($arrayScore) / $nbResultats, 1);
-
-        //calcul de la mediane
-        sort($arrayScore);
-        $indexScore = ceil(($nbResultats + 1) / 2);
-        $mediane = $arrayScore[$indexScore - 1]; //-1 car ca comment à 1 et pas 0
 
         $data = array();
 
@@ -387,13 +363,13 @@ class QuizController extends AbstractController
         //data quiz
         $data = $quizService->addRow($data, array(
             $quiz->getIntitule(),
-            $nbResultats,
-            $scoreMoyen,
-            $mediane
+            $statArray["nbResultats"],
+            $statArray["scoreMoyen"],
+            $statArray["mediane"]
         ));
 
         //blank row
-        $data = $quizService->addRow($data, array(""));
+        $data = $quizService->addRow($data, array(" "));
 
         //headers question reponse
         $data = $quizService->addRow($data, array(
@@ -404,7 +380,7 @@ class QuizController extends AbstractController
             "Reponse fausse"
         ));
 
-        foreach ($quizAvecQuestionsReponses->getQuestions() as $question) {
+        foreach ($statArray["quizAvecQuestionsReponses"]->getQuestions() as $question) {
             $questionsReponses = array();
 
             array_push($questionsReponses, $question->getIntitule());
@@ -412,7 +388,7 @@ class QuizController extends AbstractController
             foreach ($question->getReponses() as $reponse) {
                 $intituleReponse = $reponse->getIntitule();
 
-                foreach ($nbReponsesParQuiz as $nombre) {
+                foreach ($statArray["nbReponsesParQuiz"] as $nombre) {
                     if ($nombre["id"] == $reponse->getId()) {
                         $intituleReponse .= " (" . $nombre[1] . ")";
                     }

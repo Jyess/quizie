@@ -8,10 +8,12 @@ use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
 use App\Service\QuizService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -80,7 +82,7 @@ class QuestionController extends AbstractController
 
     /**
      * Récupère les ids des questions d'un quiz.
-     * 
+     *
      * @Route("/recuperer-questions/{idQuiz}", name="quiz_recupererQuestionsDejaCreees")
      * @param $idQuiz
      * @param Request $request
@@ -88,6 +90,7 @@ class QuestionController extends AbstractController
      * @param QuizRepository $quizRepository
      * @param QuizService $quizService
      * @return JsonResponse
+     * @throws NonUniqueResultException
      */
     public function recupererQuestionsDejaCreees($idQuiz, Request $request, QuestionRepository $questionRepository, QuizRepository $quizRepository, QuizService $quizService)
     {

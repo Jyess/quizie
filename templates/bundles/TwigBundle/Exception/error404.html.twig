@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page introuvable{% endblock %}
+
+{% block body %}
+
+    <h1 class="title text-center">Cette page n'existe pas</h1>
+
+    <div class="card my-4">
+        <h5 class="card-header">
+            Que souhaitez-vous faire ?
+        </h5>
+
+        <div class="card-body">
+            {% for i in 0..3 %}
+                <div class="custom-control custom-radio py-2">
+                    <input type="radio" id="reponse{{ i }}" name="reponse" class="custom-control-input" required>
+                    <label class="custom-control-label" for="reponse{{ i }}">Retournez à la page d'accueil</label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <a class="btn btn-primary btn-lg d-block col-lg-6 mx-auto mt-3" href="{{ path('accueil_index') }}" role="button">Valider le questionnaire</a>
+
+{% endblock %}

@@ -8,6 +8,7 @@ use App\Entity\Quiz;
 use App\Entity\Utilisateur;
 use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
+use App\Repository\ResultatRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 class QuizService
 {
     private $quizRepository;
+    private $resultatRepository;
     private $questionRepository;
     private $utilisateur;
 
@@ -24,11 +26,20 @@ class QuizService
      * @param QuestionRepository $questionRepository
      * @param Security $security
      */
-    public function __construct(QuizRepository $quizRepository, QuestionRepository $questionRepository, Security $security)
+    public function __construct(QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuestionRepository $questionRepository, Security $security)
     {
         $this->quizRepository = $quizRepository;
+        $this->resultatRepository = $resultatRepository;
         $this->questionRepository = $questionRepository;
         $this->utilisateur = $security->getUser();
+    }
+
+    /**
+     * @return ResultatRepository
+     */
+    public function getResultatRepository(): ResultatRepository
+    {
+        return $this->resultatRepository;
     }
 
     /**
@@ -57,6 +68,8 @@ class QuizService
 
     /**
      * Vérifie si la date et l'heure actuelle soit bien comprise dans l'intervalle de la plage horaire d'un quiz.
+     * @param $idQuiz
+     * @return bool
      */
     public function verifPlageHoraire($idQuiz)
     {
@@ -85,10 +98,10 @@ class QuizService
 
     /**
      * Vérifie si l'utilisateur actuel est bien celui qui a créé le quiz ou la question.
-     *
      * @param $idQuiz
      * @param null $idQuestion
      * @return Quiz[]|bool|object[]
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function isOwner($idQuiz, $idQuestion = null)
     {
@@ -102,7 +115,6 @@ class QuizService
 
     /**
      * Vérifie si l'utilisateur est bien le créateur du quiz.
-     *
      * @param $idQuiz
      * @return Quiz[]|bool|object[]
      */
@@ -118,7 +130,6 @@ class QuizService
 
     /**
      * Vérifie si un quiz existe.
-     *
      * @param $idQuiz
      * @return Quiz|object|null
      */
@@ -129,6 +140,7 @@ class QuizService
 
     /**
      * Genère un fichier CSV.
+     * @param $data
      */
     public function exportCSV($data)
     {
@@ -145,6 +157,12 @@ class QuizService
         fclose($output);
     }
 
+    /**
+     * Ajoute une ligne à un fichier CSV.
+     * @param $data
+     * @param $rowData
+     * @return mixed
+     */
     public function addRow($data, $rowData)
     {
         $row = array();
@@ -156,5 +174,55 @@ class QuizService
         array_push($data, $row);
 
         return $data;
+    }
+
+    /**
+     * Retourne un array de data d'un quiz.
+     * @param $idQuiz
+     * @return array
+     */
+    public function statData($idQuiz) {
+        $arrayStat = array();
+
+        $resultatsUnQuiz = $this->getResultatRepository()->findBy(['quiz' => $idQuiz]);
+        $arrayStat["resultatsUnQuiz"] = $resultatsUnQuiz;
+
+        //nombre de fois qu'une quiz a ete fait
+        $nbResultats = count($resultatsUnQuiz);
+        $arrayStat["nbResultats"] = $nbResultats;
+
+        //retourne null si aucun resultat au quiz
+        if ($nbResultats == 0) {
+            return null;
+        }
+
+        //recup les questions reponses
+        $quizAvecQuestionsReponses = $this->getQuizRepository()->findQuestionsWithAnswers($idQuiz);
+        $arrayStat["quizAvecQuestionsReponses"] = $quizAvecQuestionsReponses;
+
+        $nbReponsesParQuiz = $this->getResultatRepository()->nbReponsesParQuiz($idQuiz);
+        $arrayStat["nbReponsesParQuiz"] = $nbReponsesParQuiz;
+
+        $idsReponsesRepondues = $this->getResultatRepository()->getIdsReponsesRepondues($idQuiz);
+        $arrayStat["idsReponsesRepondues"] = $idsReponsesRepondues;
+
+        //recup tous les scores
+        $arrayScore = array();
+        foreach ($resultatsUnQuiz as $resultat) {
+            array_push($arrayScore, $resultat->getScore());
+        }
+
+        //calcul du score moyen
+        $arrayScore = array_filter($arrayScore); //verif chaque valeur
+        $scoreMoyen = round(array_sum($arrayScore) / $nbResultats, 1);
+        $arrayStat["scoreMoyen"] = $scoreMoyen;
+
+        //calcul de la mediane
+        sort($arrayScore);
+        $indexScore = ceil(($nbResultats + 1) / 2);
+        $mediane = $arrayScore[$indexScore - 1]; //-1 car ca comment à 1 et pas 0
+        $arrayStat["mediane"] = $mediane;
+
+        return $arrayStat;
     }
 }

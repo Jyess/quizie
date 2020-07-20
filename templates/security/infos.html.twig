@@ -4,10 +4,12 @@
 
 {% block body %}
 
+    <h1 class="title text-center">Mes données personnelles</h1>
+
     <div class="col">
-        <div class="row">Nom : {{ utilisateur.prenom }}</div>
-        <div class="row">Prénom : {{ utilisateur.nom }}</div>
-        <div class="row">Adresse email : {{ utilisateur.email }}</div>
+        <div class="row"><span class="font-weight-bold mr-1">Nom : </span> {{ utilisateur.prenom }}</div>
+        <div class="row"><span class="font-weight-bold mr-1">Prénom : </span> {{ utilisateur.nom }}</div>
+        <div class="row"><span class="font-weight-bold mr-1">Adresse email : </span> {{ utilisateur.email }}</div>
     </div>
 
 {% endblock %}
