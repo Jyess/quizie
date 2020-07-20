@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ReponseRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ReponseRepository::class)
@@ -19,6 +20,7 @@ class Reponse
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max = 255, maxMessage = "La question doit faire moins de 255 caractères.")
      */
     private $intitule;
 

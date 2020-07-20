@@ -25,7 +25,15 @@
 
 		<div class="reponses" data-prototype="{{ form_row(questionFormulaire.reponses.vars.prototype)|e('html_attr') }}">
 			{% for reponse in questionFormulaire.reponses %}
-				{{ form_widget(reponse) }}
+				{{ form_row(reponse) }}
+
+				{% if reponse.vars['errors']|length > 0 %}
+					<div class="error_form">
+						{% for error in reponse.vars['errors'] %}
+							<span class="badge badge-danger">{{ error.message }}</span>
+						{% endfor %}
+					</div>
+				{% endif %}
 			{% endfor %}
 		</div>
 

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UtilisateurRepository::class)
@@ -20,16 +21,19 @@ class Utilisateur implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max = 255, maxMessage = "Le nom doit faire moins de 255 caractères.")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max = 255, maxMessage = "Le prénom doit faire moins de 255 caractères.")
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Length(max = 255, maxMessage = "Le mail doit faire moins de 180 caractères.")
      */
     private $email;
 
@@ -46,6 +50,7 @@ class Utilisateur implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\Length(max = 255, maxMessage = "Le mot de passe doit faire moins de 255 caractères.")
      */
     private $password;
 
