@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Quiz;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,16 +37,44 @@ class QuizRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return Query Returns an array of Quiz objects
+     */
+    public function findAllWithQuestionsQuery()
+    {
+        return $this->createQueryBuilder('quiz')
+            ->join('quiz.questions', 'question')
+            ->where('question > 0')
+            ->getQuery();
+    }
+
+    /**
+     * @param $idUtilisateur
+     * @return Query Returns an array of Quiz objects
+     */
+    public function getMesQuizQuery($idUtilisateur)
+    {
+        return $this->createQueryBuilder('quiz')
+            ->where('quiz.utilisateurCreateur = :idUtilisateur')
+            ->setParameter('idUtilisateur', $idUtilisateur)
+            ->getQuery();
+    }
+
+    /**
+     * @param $idQuiz
      * @return Quiz[] Returns an array of Quiz objects
      */
     public function hasAccessKey($idQuiz)
     {
-        return $this->createQueryBuilder('quiz')
-            ->select('quiz.cleAcces')
-            ->where('quiz.id = :idQuiz')
-            ->setParameter('idQuiz', $idQuiz)
-            ->getQuery()
-            ->getSingleScalarResult();
+        try {
+            return $this->createQueryBuilder('quiz')
+                ->select('quiz.cleAcces')
+                ->where('quiz.id = :idQuiz')
+                ->setParameter('idQuiz', $idQuiz)
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (NoResultException | NonUniqueResultException $e) {
+            return null;
+        }
     }
 
     /**

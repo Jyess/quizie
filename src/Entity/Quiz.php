@@ -141,4 +141,11 @@ class Quiz
         }
         return $randomString;
     }
+
+    public function __toString()
+    {
+        return "sa";
+    }
+
+
 }

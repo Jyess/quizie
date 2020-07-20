@@ -16,6 +16,9 @@ use App\Repository\ReponseRepository;
 use App\Repository\ResultatRepository;
 use App\Service\QuizService;
 use Doctrine\ORM\NonUniqueResultException;
+use Knp\Bundle\PaginatorBundle\KnpPaginatorBundle;
+use Knp\Component\Pager\Paginator;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -97,30 +100,46 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/mes-quiz", name="quiz_voirTousMesQuiz")
+     * @Route("/mes-quiz/{page}", defaults={"page"=1}, name="quiz_voirTousMesQuiz")
+     * @param Request $request
      * @param QuizRepository $quizRepository
+     * @param PaginatorInterface $paginator
      * @return Response
      */
-    public function voirTousMesQuiz(QuizRepository $quizRepository)
+    public function voirTousMesQuiz(Request $request, QuizRepository $quizRepository, PaginatorInterface $paginator)
     {
-        $mesQuiz = $quizRepository->findBy(['utilisateurCreateur' => $this->getUser()]);
+        $tousMesQuizQuery = $quizRepository->getMesQuizQuery($this->getUser()->getId());
+
+        $pagination = $paginator->paginate(
+            $tousMesQuizQuery,
+            $request->query->getInt('page', 1),
+            10
+        );
 
         return $this->render('quiz/tous_mes_quiz.html.twig', [
-            'mesQuiz' => $mesQuiz
+            'pagination' => $pagination
         ]);
     }
 
     /**
-     * @Route("/quiz", name="quiz_tousLesQuiz")
+     * @Route("/quiz/page/{page}", defaults={"page"=1}, name="quiz_tousLesQuiz")
+     * @param Request $request
      * @param QuizRepository $quizRepository
+     * @param PaginatorInterface $paginator
      * @return Response
      */
-    public function tousLesQuiz(QuizRepository $quizRepository)
+    public function tousLesQuiz($page, Request $request, QuizRepository $quizRepository, PaginatorInterface $paginator)
     {
-        $lesQuiz = $quizRepository->findAllWithQuestions();
+        $lesQuizQuery = $quizRepository->findAllWithQuestionsQuery();
+
+        $pagination = $paginator->paginate(
+            $lesQuizQuery,
+            $request->query->getInt('page', $page),
+            10
+        );
 
         return $this->render('quiz/tous_les_quiz.html.twig', [
-            'lesQuiz' => $lesQuiz
+            'pagination' => $pagination
         ]);
     }
 

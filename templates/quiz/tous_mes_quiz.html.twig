@@ -7,7 +7,7 @@
 	<h1 class="title text-center mb-4">Tous mes quiz créés</h1>
 
 	<div class="list-group text-break">
-		{% for unQuiz in mesQuiz %}
+		{% for unQuiz in pagination %}
 			<div class="row">
 				<div class="col-lg-10">
 					<a title="Faire le quiz" href="{{ path("quiz_afficherQuiz", { 'idQuiz' : unQuiz.id }) }}" class="list-group-item list-group-item-action">
@@ -35,13 +35,15 @@
 			</div>
 		{% endfor %}
 
-		{% if mesQuiz is empty %}
+		{% if pagination is empty %}
 			<div class="alert alert-secondary mx-auto col-lg-6" role="alert">
 				<div class="text-center">Vous n'avez pas encore créé de quiz.</div>
 			</div>
 
 			<a class="btn btn-secondary col-lg-4 mx-auto" href="{{ path('quiz_creerQuiz') }}" role="button">Créer un quiz maintenant</a>
 		{% endif %}
+
+		{{ knp_pagination_render(pagination) }}
 	</div>
 {% endblock %}
 

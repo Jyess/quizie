@@ -7,23 +7,50 @@
 	<h1 class="title text-center m">Les quiz disponibles</h1>
 
 	<div class="list-group text-break">
-		{% for quiz in lesQuiz %}
+		{% for quiz in pagination %}
 			<a class="list-group-item list-group-item-action" href="{{ path('quiz_afficherQuiz', {'idQuiz' : quiz.id}) }}">
 				{{ quiz.intitule|trimLong(40) }}
+				<span class="font-italic"> |
+					<span class="font-weight-bold">{{ quiz.utilisateurCreateur.prenom ~ ' ' ~ quiz.utilisateurCreateur.nom }}</span>
+				</span>
 
 				<span class="font-italic float-right">
-					Créé par
-					<span class="font-weight-bold">{{ quiz.utilisateurCreateur.prenom ~ ' ' ~ quiz.utilisateurCreateur.nom }}</span>
+					{% if quiz.cleAcces %}
+						<span class="badge badge-dark">Privé</span>
+					{% else %}
+						<span class="badge badge-secondary">Public</span>
+					{% endif %}
+
+					{% set now = "now"|date("Y-m-d H:i:s", "Europe/Paris") %}
+					{% if (now >= quiz.plageHoraireDebut|date("Y-m-d H:i:s", "Europe/Paris") and now <= quiz.plageHoraireFin|date("Y-m-d H:i:s", "Europe/Paris")) or quiz.plageHoraireDebut is null %}
+						<span class="badge badge-info">Disponible</span>
+					{% else %}
+						<span class="badge badge-danger">Plus disponible</span>
+					{% endif %}
 				</span>
 			</a>
 		{% endfor %}
 	</div>
 
-	{% if lesQuiz is empty %}
+	{% if pagination is empty %}
 		<div class="alert alert-warning col-lg-6 mx-auto mt-3" role="alert">
 			<div class="text-center px-2">Aucun quiz n'est disponible pour le moment.</div>
 		</div>
 	{% endif %}
+
+	<div class="navigation">
+		{{ knp_pagination_render(pagination) }}
+	</div>
+
+{#	<nav aria-label="Page navigation example">#}
+{#		<ul class="pagination">#}
+{#			<li class="page-item"><a class="page-link" href="#">Précédent</a></li>#}
+{#			<li class="page-item"><a class="page-link" href="#">1</a></li>#}
+{#			<li class="page-item"><a class="page-link" href="#">2</a></li>#}
+{#			<li class="page-item"><a class="page-link" href="#">3</a></li>#}
+{#			<li class="page-item"><a class="page-link" href="#">Suivant</a></li>#}
+{#		</ul>#}
+{#	</nav>#}
 {% endblock %}
 
 {% block javascripts %}

@@ -23,7 +23,7 @@
 
 .questionNum {
   font-size: 6rem;
-  font-family: Consolas;
+  font-family: Consolas, serif;
 }
 
 /*là où on écrit la question*/

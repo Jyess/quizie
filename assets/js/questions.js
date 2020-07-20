@@ -376,6 +376,14 @@ $(document).ready(function () {
 
   // suppression d'une question dans la base de données
   $(document).on("click", ".deleteQuestion", function (e) {
+    let confirmation = confirm(
+      "Êtes-vous sûr de vouloir supprimer cette question ?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
     let $formHolder = $(this).closest(".form");
     let $currentButton = $(this);
 
@@ -420,7 +428,7 @@ $(document).ready(function () {
       .val(Math.floor(Math.random() * -20));
   });
 
-  // $(window).on("beforeunload", function () {
-  //   return ""; //inutile car pas afficher
-  // });
+  $(window).on("beforeunload", function () {
+    return ""; //inutile car pas afficher
+  });
 });
