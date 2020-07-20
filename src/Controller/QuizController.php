@@ -320,7 +320,7 @@ class QuizController extends AbstractController
 
         $quiz = $quizRepository->find($idQuiz);
 
-        $statArray = $quizService->statData($idQuiz);
+        $statArray = $quizService->statData($idQuiz, 'quiz');
 
         //si aucun resultat, on va direct sur la page des stat
         if (!$statArray) {
@@ -359,7 +359,7 @@ class QuizController extends AbstractController
         $user = $this->getUser();
         $quiz = $quizRepository->find($idQuiz);
 
-        $statArray = $quizService->statData($idQuiz);
+        $statArray = $quizService->statData($idQuiz, 'quiz');
 
         $filename = "Résultats du Quiz #" . $quiz->getId() . " - " . $user->getNom();
 
@@ -426,7 +426,7 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/stat/mes-quiz", name="quiz_voirStatMesQuiz")
+     * @Route("/stat/mes-quiz/{idUser}", name="quiz_voirStatMesQuiz")
      * @param $idQuiz
      * @param Request $request
      * @param QuizRepository $quizRepository
@@ -435,16 +435,15 @@ class QuizController extends AbstractController
      * @return Response
      * @throws NonUniqueResultException
      */
-    public function voirStatMesQuiz($idQuiz, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    public function voirStatMesQuiz($idUser, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
+        $user = $this->getUser();
         //vérifie que le user connecté est bien le créateur
-        if (!$quizService->isOwner($idQuiz)) {
+        if (!$user || $user->getId() != $idUser) {
             throw new AccessDeniedException();
         }
 
-        $quiz = $quizRepository->find($idQuiz);
-
-        $statArray = $quizService->statData($idQuiz);
+        $statArray = $quizService->statData($idUser, 'user');
 
         //si aucun resultat, on va direct sur la page des stat
         if (!$statArray) {
@@ -454,7 +453,7 @@ class QuizController extends AbstractController
         }
 
         return $this->render('quiz/stat_quiz.html.twig', [
-            'leQuiz' => $quiz,
+            'leQuiz' => null,
             'quizAvecQuestionsReponses' => $statArray["quizAvecQuestionsReponses"],
             'nbResultats' => $statArray["nbResultats"],
             'scoreMoyen' => $statArray["scoreMoyen"],
@@ -465,7 +464,7 @@ class QuizController extends AbstractController
     }
 
     /**
-     * @Route("/export-resultats/mes-quiz", name="quiz_exportResultatsCSVMesQuiz")
+     * @Route("/export-resultats/mes-quiz/{idUser}", name="quiz_exportResultatsCSVMesQuiz")
      * @param $idQuiz
      * @param QuizRepository $quizRepository
      * @param ResultatRepository $resultatRepository
@@ -473,19 +472,17 @@ class QuizController extends AbstractController
      * @return Response
      * @throws NonUniqueResultException
      */
-    public function exportResultatsCSVMesQuiz($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    public function exportResultatsCSVMesQuiz($idUser, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
+        $user = $this->getUser();
         //vérifie que le user connecté est bien le créateur
-        if (!$quizService->isOwner($idQuiz)) {
+        if (!$user || $user->getId() != $idUser) {
             throw new AccessDeniedException();
         }
 
-        $user = $this->getUser();
-        $quiz = $quizRepository->find($idQuiz);
+        $statArray = $quizService->statData($idUser, 'user');
 
-        $statArray = $quizService->statData($idQuiz);
-
-        $filename = "Résultats du Quiz #" . $quiz->getId() . " - " . $user->getNom();
+        $filename = "Résultats globaux de mes Quiz" . " - " . $user->getNom();
 
         $response = new Response();
 
@@ -497,7 +494,6 @@ class QuizController extends AbstractController
 
         //headers quiz
         $data = $quizService->addRow($data, array(
-            "Nom du quiz",
             "Nombre de résultats",
             "Score moyen",
             "Médiane des scores"
@@ -505,7 +501,6 @@ class QuizController extends AbstractController
 
         //data quiz
         $data = $quizService->addRow($data, array(
-            $quiz->getIntitule(),
             $statArray["nbResultats"],
             $statArray["scoreMoyen"],
             $statArray["mediane"]
@@ -516,6 +511,7 @@ class QuizController extends AbstractController
 
         //headers question reponse
         $data = $quizService->addRow($data, array(
+            "Quiz",
             "Question",
             "Reponse juste",
             "Reponse fausse",
@@ -523,25 +519,31 @@ class QuizController extends AbstractController
             "Reponse fausse"
         ));
 
-        foreach ($statArray["quizAvecQuestionsReponses"]->getQuestions() as $question) {
-            $questionsReponses = array();
+        $numQuiz = 1;
+        foreach ($statArray["quizAvecQuestionsReponses"] as $quiz) {
+            foreach ($quiz->getQuestions() as $question) {
 
-            array_push($questionsReponses, $question->getIntitule());
+                $questionsReponses = array();
 
-            foreach ($question->getReponses() as $reponse) {
-                $intituleReponse = $reponse->getIntitule();
+                array_push($questionsReponses, "Quiz #" . $numQuiz);
+                array_push($questionsReponses, $question->getIntitule());
 
-                foreach ($statArray["nbReponsesParQuiz"] as $nombre) {
-                    if ($nombre["id"] == $reponse->getId()) {
-                        $intituleReponse .= " (" . $nombre[1] . ")";
+                foreach ($question->getReponses() as $reponse) {
+                    $intituleReponse = $reponse->getIntitule();
+
+                    foreach ($statArray["nbReponsesParQuiz"] as $nombre) {
+                        if ($nombre["id"] == $reponse->getId()) {
+                            $intituleReponse .= " (" . $nombre[1] . ")";
+                        }
                     }
+
+                    array_push($questionsReponses, $intituleReponse);
                 }
 
-                array_push($questionsReponses, $intituleReponse);
+                //data question reponse
+                $data = $quizService->addRow($data, $questionsReponses);
             }
-
-            //data question reponse
-            $data = $quizService->addRow($data, $questionsReponses);
+            $numQuiz++;
         }
 
         $quizService->exportCSV($data);

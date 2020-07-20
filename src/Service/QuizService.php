@@ -181,18 +181,23 @@ class QuizService
      * @param $idQuiz
      * @return array
      */
-    public function statData($idQuiz, $voirStatTousLesQuiz = false, $idUser = null) {
+    public function statData($id, $quizOrUser)
+    {
         $arrayStat = array();
 
-        if ($voirStatTousLesQuiz && $idUser) {
-            $resultatsQuiz = $this->getResultatTousLesQuizUser($idUser);
+        if ($quizOrUser == "user") {
+            $resultatsQuiz = $this->getResultatRepository()->getResultatTousLesQuizUser($id);
+
+            $quizAvecQuestionsReponses = $this->getQuizRepository()->findQuestionsWithAnswersQuizUser($id);
+            $nbReponsesParQuiz = $this->getResultatRepository()->nbReponsesPourLesQuizUser($id);
+            $idsReponsesRepondues = $this->getResultatRepository()->getIdsReponsesReponduesTousQuizUser($id);
         } else {
-            $resultatsQuiz = $this->getResultatRepository()->findBy(['quiz' => $idQuiz]);
+            $resultatsQuiz = $this->getResultatRepository()->findBy(['quiz' => $id]);
+
+            $quizAvecQuestionsReponses = $this->getQuizRepository()->findQuestionsWithAnswers($id);
+            $nbReponsesParQuiz = $this->getResultatRepository()->nbReponsesParQuiz($id);
+            $idsReponsesRepondues = $this->getResultatRepository()->getIdsReponsesRepondues($id);
         }
-
-        //faire un foreach et assigner l'id du quiz a chaque fois
-
-//        $arrayStat["resultatsQuiz"] = $resultatsQuiz;
 
         //nombre de fois qu'une quiz a ete fait
         $nbResultats = count($resultatsQuiz);
@@ -204,13 +209,8 @@ class QuizService
         }
 
         //recup les questions reponses
-        $quizAvecQuestionsReponses = $this->getQuizRepository()->findQuestionsWithAnswers($idQuiz);
         $arrayStat["quizAvecQuestionsReponses"] = $quizAvecQuestionsReponses;
-
-        $nbReponsesParQuiz = $this->getResultatRepository()->nbReponsesParQuiz($idQuiz);
         $arrayStat["nbReponsesParQuiz"] = $nbReponsesParQuiz;
-
-        $idsReponsesRepondues = $this->getResultatRepository()->getIdsReponsesRepondues($idQuiz);
         $arrayStat["idsReponsesRepondues"] = $idsReponsesRepondues;
 
         //recup tous les scores

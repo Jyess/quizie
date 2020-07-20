@@ -4,17 +4,25 @@
 {% endblock %}
 
 {% block body %}
-	<h1 class="title text-center mb-4">Statistiques de mon quiz</h1>
+	{% if leQuiz %}
+		<h1 class="title text-center mb-4">Statistiques de mon quiz</h1>
+	{% else %}
+		<h1 class="title text-center mb-4">Statistiques de tous mes quiz</h1>
+	{% endif %}
 
 	{% if nbResultats > 0 %}
 		<div class="row">
-			<div class="col-lg my-2 my-lg-0">
-				<div class="text-center">
-					<span class="font-weight-bold">Nom du quiz</span>
-					<br>
-					{{ leQuiz.intitule|trimLong }}
+
+			{% if leQuiz %}
+				<div class="col-lg my-2 my-lg-0">
+					<div class="text-center">
+						<span class="font-weight-bold">Nom du quiz</span>
+						<br>
+						{{ leQuiz.intitule|trimLong }}
+					</div>
 				</div>
-			</div>
+			{% endif %}
+
 			<div class="col-lg my-2 my-lg-0">
 				<div class="text-center">
 					<span class="font-weight-bold">Nombre de résultats</span>
@@ -40,57 +48,128 @@
 			</div>
 		</div>
 
-		<div class="text-center my-3">
-			<a class="btn btn-info mx-3 my-lg my-2" href="{{ path('quiz_exportResultatsCSV', {'idQuiz' : leQuiz.id}) }}" role="button">Exporter les résultats
-				<span class="badge badge-light">Format CSV</span>
-			</a>
-		</div>
+		{% if leQuiz %}
+			<div class="text-center my-3">
+				<a class="btn btn-info mx-3 my-lg my-2" href="{{ path('quiz_exportResultatsCSV', {'idQuiz' : leQuiz.id}) }}" role="button">Exporter les résultats
+					<span class="badge badge-light">Format CSV</span>
+				</a>
+			</div>
 
-		{% set numQuestion = 0 %}
-		{% for question in quizAvecQuestionsReponses.questions %}
-			{% set numQuestion = numQuestion + 1 %}
+			{% set numQuestion = 0 %}
+			{% for question in quizAvecQuestionsReponses.questions %}
+				{% set numQuestion = numQuestion + 1 %}
 
-			<div class="card my-4">
-				<h5 class="card-header">
-					#{{ numQuestion }}
-					:
-					{{ question.intitule }}
-				</h5>
+				<div class="card my-4">
+					<h5 class="card-header">
+						#{{ numQuestion }}
+						:
+						{{ question.intitule }}
+					</h5>
 
-				<div class="card-body">
-					<div class="mb-3 float-right">
-						<span class="badge badge-pill badge-success">{{ question.nbPointsBonneReponse }}
-							points</span>
-						<span class="badge badge-pill badge-danger">{{ question.nbPointsMauvaiseReponse }}
-							points</span>
-					</div>
+					<div class="card-body">
+						<div class="mb-3 float-right">
+							<span class="badge badge-pill badge-success">{{ question.nbPointsBonneReponse }}
+								points</span>
+							<span class="badge badge-pill badge-danger">{{ question.nbPointsMauvaiseReponse }}
+								points</span>
+						</div>
 
-					{% for reponse in question.reponses %}
-						<div class="card-text my-2 {% if reponse.vraiFaux %}text-success{% else %}text-danger{% endif %}">
-							{{ reponse.intitule }}
+						{% for reponse in question.reponses %}
+							<div class="card-text my-2 {% if reponse.vraiFaux %}text-success{% else %}text-danger{% endif %}">
 
-							{% for reponseChoisie in nbReponseQuiz %}
-								{% if reponseChoisie["id"] == reponse.id %}
+								{% if reponse.vraiFaux %}
+									&check;
+								{% else %}
+									&cross;
+								{% endif %}
+
+								{{ reponse.intitule }}
+
+								{% for reponseChoisie in nbReponseQuiz %}
+									{% if reponseChoisie["id"] == reponse.id %}
+										<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
+											(répondue
+											<span class="font-weight-bold">{{ reponseChoisie[1] }}</span>
+											fois)
+										</span>
+									{% endif %}
+								{% endfor %}
+
+								{% if reponse.id not in idsReponsesRepondues %}
 									<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
 										(répondue
-										<span class="font-weight-bold">{{ reponseChoisie[1] }}</span>
+										<span class="font-weight-bold">0</span>
 										fois)
 									</span>
 								{% endif %}
-							{% endfor %}
-
-							{% if reponse.id not in idsReponsesRepondues %}
-								<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
-									(répondue
-									<span class="font-weight-bold">0</span>
-									fois)
-								</span>
-							{% endif %}
-						</div>
-					{% endfor %}
+							</div>
+						{% endfor %}
+					</div>
 				</div>
+			{% endfor %}
+
+		{% else %}
+			<div class="text-center my-3">
+				<a class="btn btn-info mx-3 my-lg my-2" href="{{ path('quiz_exportResultatsCSVMesQuiz', {'idUser' : app.user.id}) }}" role="button">Exporter les résultats
+					<span class="badge badge-light">Format CSV</span>
+				</a>
 			</div>
-		{% endfor %}
+
+			{% set numQuiz = 1 %}
+			{% for quiz in quizAvecQuestionsReponses %}
+				<h3>Quiz #{{ numQuiz }}
+					:
+				</h3>
+
+				{% set numQuestion = 1 %}
+				{% for question in quiz.questions %}
+					<div class="card my-4">
+						<h5 class="card-header">
+							#{{ numQuestion }}
+							:
+							{{ question.intitule }}
+						</h5>
+
+						<div class="card-body">
+							<div class="mb-3 float-right">
+								<span class="badge badge-pill badge-success">{{ question.nbPointsBonneReponse }}
+									points</span>
+								<span class="badge badge-pill badge-danger">{{ question.nbPointsMauvaiseReponse }}
+									points</span>
+							</div>
+
+							{% for reponse in question.reponses %}
+								<div class="card-text my-2 {% if reponse.vraiFaux %}text-success{% else %}text-danger{% endif %}">
+									{{ reponse.intitule }}
+
+									{% for reponseChoisie in nbReponseQuiz %}
+										{% if reponseChoisie["id"] == reponse.id %}
+											<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
+												(répondue
+												<span class="font-weight-bold">{{ reponseChoisie[1] }}</span>
+												fois)
+											</span>
+										{% endif %}
+									{% endfor %}
+
+									{% if reponse.id not in idsReponsesRepondues %}
+										<span class="badge badge-light ml-3 text-black-50 font-weight-normal">
+											(répondue
+											<span class="font-weight-bold">0</span>
+											fois)
+										</span>
+									{% endif %}
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+					{% set numQuestion = numQuestion + 1 %}
+				{% endfor %}
+				<hr class="my-5">
+				{% set numQuiz = numQuiz + 1 %}
+			{% endfor %}
+		{% endif %}
+
 	{% else %}
 		<div class="alert alert-warning mx-auto text-center col-lg-6" role="alert">
 			<span class="font-weight-bold">Personne</span>

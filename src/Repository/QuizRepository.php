@@ -91,6 +91,20 @@ class QuizRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @return Quiz Returns an array of Quiz objects
+     */
+    public function findQuestionsWithAnswersQuizUser($idUser)
+    {
+        return $this->createQueryBuilder('quiz')
+            ->join('quiz.questions', 'question')
+            ->join('question.reponses', 'reponse')
+            ->where('quiz.utilisateurCreateur = :idUser')
+            ->setParameter('idUser', $idUser)
+            ->getQuery()
+            ->getResult();
+    }
+
     /*
     public function findOneBySomeField($value): ?Quiz
     {

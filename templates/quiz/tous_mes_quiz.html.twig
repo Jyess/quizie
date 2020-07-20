@@ -6,6 +6,10 @@
 {% block body %}
 	<h1 class="title text-center mb-4">Tous mes quiz créés</h1>
 
+	<a class="btn btn-primary mx-auto d-block col-lg-3 mb-4" href=" {{ path('quiz_voirStatMesQuiz', {'idUser' : app.user.id} ) }}" role="button">
+		Voir mes stats globales
+	</a>
+
 	<div class="list-group text-break">
 		{% for unQuiz in pagination %}
 			<div class="row">

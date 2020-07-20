@@ -37,6 +37,22 @@ class ResultatRepository extends ServiceEntityRepository
     /**
      * @return Resultat[] Returns an array of Resultat objects
      */
+    public function nbReponsesPourLesQuizUser($idUser)
+    {
+        return $this->createQueryBuilder('res')
+            ->select('rep.id', 'count(rep.id)')
+            ->join('res.reponses', 'rep')
+            ->join('res.quiz', 'quiz')
+            ->andWhere('quiz.utilisateurCreateur = :idUser')
+            ->groupBy('rep.id')
+            ->setParameter('idUser', $idUser)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Resultat[] Returns an array of Resultat objects
+     */
     public function getIdsReponsesRepondues($idQuiz)
     {
         $query = $this->createQueryBuilder('res')
@@ -44,6 +60,28 @@ class ResultatRepository extends ServiceEntityRepository
             ->join('res.reponses', 'rep')
             ->where('res.quiz = :idQuiz')
             ->setParameter('idQuiz', $idQuiz)
+            ->getQuery()
+            ->getResult();
+
+        $simpleArray = array();
+        foreach ($query as $value) {
+            array_push($simpleArray, $value['id']);
+        }
+
+        return $simpleArray;
+    }
+
+    /**
+     * @return Resultat[] Returns an array of Resultat objects
+     */
+    public function getIdsReponsesReponduesTousQuizUser($idUser)
+    {
+        $query = $this->createQueryBuilder('res')
+            ->select('rep.id')
+            ->join('res.reponses', 'rep')
+            ->join('res.quiz', 'quiz')
+            ->where('quiz.utilisateurCreateur = :idUser')
+            ->setParameter('idUser', $idUser)
             ->getQuery()
             ->getResult();
 
