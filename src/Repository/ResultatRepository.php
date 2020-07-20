@@ -55,6 +55,20 @@ class ResultatRepository extends ServiceEntityRepository
         return $simpleArray;
     }
 
+    /**
+     * @param $idUser
+     * @return Resultat[] Returns an array of Resultat objects
+     */
+    public function getResultatTousLesQuizUser($idUser)
+    {
+        return $this->createQueryBuilder('res')
+            ->join('res.quiz', 'quiz')
+            ->where('quiz.utilisateurCreateur = :idUser')
+            ->setParameter('idUser', $idUser)
+            ->getQuery()
+            ->getResult();
+    }
+
     /*
     public function findOneBySomeField($value): ?Resultat
     {

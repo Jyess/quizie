@@ -181,14 +181,21 @@ class QuizService
      * @param $idQuiz
      * @return array
      */
-    public function statData($idQuiz) {
+    public function statData($idQuiz, $voirStatTousLesQuiz = false, $idUser = null) {
         $arrayStat = array();
 
-        $resultatsUnQuiz = $this->getResultatRepository()->findBy(['quiz' => $idQuiz]);
-        $arrayStat["resultatsUnQuiz"] = $resultatsUnQuiz;
+        if ($voirStatTousLesQuiz && $idUser) {
+            $resultatsQuiz = $this->getResultatTousLesQuizUser($idUser);
+        } else {
+            $resultatsQuiz = $this->getResultatRepository()->findBy(['quiz' => $idQuiz]);
+        }
+
+        //faire un foreach et assigner l'id du quiz a chaque fois
+
+//        $arrayStat["resultatsQuiz"] = $resultatsQuiz;
 
         //nombre de fois qu'une quiz a ete fait
-        $nbResultats = count($resultatsUnQuiz);
+        $nbResultats = count($resultatsQuiz);
         $arrayStat["nbResultats"] = $nbResultats;
 
         //retourne null si aucun resultat au quiz
@@ -208,7 +215,7 @@ class QuizService
 
         //recup tous les scores
         $arrayScore = array();
-        foreach ($resultatsUnQuiz as $resultat) {
+        foreach ($resultatsQuiz as $resultat) {
             array_push($arrayScore, $resultat->getScore());
         }
 

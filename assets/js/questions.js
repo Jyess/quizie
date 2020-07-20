@@ -371,6 +371,8 @@ $(document).ready(function () {
           '<div class="mandatoryReponses alert alert-danger" role="alert">Deux réponses sont obligatoires.</div>'
         )
         .show();
+
+      $currentButton.attr("disabled", false);
     }
   });
 

@@ -424,4 +424,128 @@ class QuizController extends AbstractController
 
         return $response;
     }
+
+    /**
+     * @Route("/stat/mes-quiz", name="quiz_voirStatMesQuiz")
+     * @param $idQuiz
+     * @param Request $request
+     * @param QuizRepository $quizRepository
+     * @param ResultatRepository $resultatRepository
+     * @param QuizService $quizService
+     * @return Response
+     * @throws NonUniqueResultException
+     */
+    public function voirStatMesQuiz($idQuiz, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    {
+        //vérifie que le user connecté est bien le créateur
+        if (!$quizService->isOwner($idQuiz)) {
+            throw new AccessDeniedException();
+        }
+
+        $quiz = $quizRepository->find($idQuiz);
+
+        $statArray = $quizService->statData($idQuiz);
+
+        //si aucun resultat, on va direct sur la page des stat
+        if (!$statArray) {
+            return $this->render('quiz/stat_quiz.html.twig', [
+                'nbResultats' => 0
+            ]);
+        }
+
+        return $this->render('quiz/stat_quiz.html.twig', [
+            'leQuiz' => $quiz,
+            'quizAvecQuestionsReponses' => $statArray["quizAvecQuestionsReponses"],
+            'nbResultats' => $statArray["nbResultats"],
+            'scoreMoyen' => $statArray["scoreMoyen"],
+            'mediane' => $statArray["mediane"],
+            'nbReponseQuiz' => $statArray["nbReponsesParQuiz"],
+            'idsReponsesRepondues' => $statArray["idsReponsesRepondues"]
+        ]);
+    }
+
+    /**
+     * @Route("/export-resultats/mes-quiz", name="quiz_exportResultatsCSVMesQuiz")
+     * @param $idQuiz
+     * @param QuizRepository $quizRepository
+     * @param ResultatRepository $resultatRepository
+     * @param QuizService $quizService
+     * @return Response
+     * @throws NonUniqueResultException
+     */
+    public function exportResultatsCSVMesQuiz($idQuiz, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
+    {
+        //vérifie que le user connecté est bien le créateur
+        if (!$quizService->isOwner($idQuiz)) {
+            throw new AccessDeniedException();
+        }
+
+        $user = $this->getUser();
+        $quiz = $quizRepository->find($idQuiz);
+
+        $statArray = $quizService->statData($idQuiz);
+
+        $filename = "Résultats du Quiz #" . $quiz->getId() . " - " . $user->getNom();
+
+        $response = new Response();
+
+        $response->headers->set('Content-type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.csv";');
+        $response->sendHeaders();
+
+        $data = array();
+
+        //headers quiz
+        $data = $quizService->addRow($data, array(
+            "Nom du quiz",
+            "Nombre de résultats",
+            "Score moyen",
+            "Médiane des scores"
+        ));
+
+        //data quiz
+        $data = $quizService->addRow($data, array(
+            $quiz->getIntitule(),
+            $statArray["nbResultats"],
+            $statArray["scoreMoyen"],
+            $statArray["mediane"]
+        ));
+
+        //blank row
+        $data = $quizService->addRow($data, array(" "));
+
+        //headers question reponse
+        $data = $quizService->addRow($data, array(
+            "Question",
+            "Reponse juste",
+            "Reponse fausse",
+            "Reponse fausse",
+            "Reponse fausse"
+        ));
+
+        foreach ($statArray["quizAvecQuestionsReponses"]->getQuestions() as $question) {
+            $questionsReponses = array();
+
+            array_push($questionsReponses, $question->getIntitule());
+
+            foreach ($question->getReponses() as $reponse) {
+                $intituleReponse = $reponse->getIntitule();
+
+                foreach ($statArray["nbReponsesParQuiz"] as $nombre) {
+                    if ($nombre["id"] == $reponse->getId()) {
+                        $intituleReponse .= " (" . $nombre[1] . ")";
+                    }
+                }
+
+                array_push($questionsReponses, $intituleReponse);
+            }
+
+            //data question reponse
+            $data = $quizService->addRow($data, $questionsReponses);
+        }
+
+        $quizService->exportCSV($data);
+
+        return $response;
+    }
 }
