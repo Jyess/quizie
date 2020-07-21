@@ -42,6 +42,8 @@ class QuizController extends AbstractController
         $quizForm = $this->createForm(QuizType::class, $quiz);
         $quizForm->handleRequest($request);
 
+        // dd($quizForm->getData());
+
         if ($quizForm->isSubmitted() && $quizForm->isValid()) {
             //si l'état est privé
             if ($request->get("quiz")['etat']) {

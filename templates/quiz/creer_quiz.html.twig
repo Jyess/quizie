@@ -24,9 +24,11 @@
 				{{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début') }}
 				<div class="input-group date" id="datetimepicker1" data-target-input="nearest">
 					{{ form_widget(quiz_formulaire.plageHoraireDebut) }}
-					<div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-						<div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					</div>
+					{# <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+											<div class="input-group-text">
+												<i class="fa fa-calendar"></i>
+											</div>
+										</div> #}
 				</div>
 			</div>
 
@@ -38,9 +40,9 @@
 
 				<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
 					{{ form_widget(quiz_formulaire.plageHoraireFin) }}
-					<div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-						<div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					</div>
+					{# <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+																<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+															</div> #}
 				</div>
 			</div>
 		</div>

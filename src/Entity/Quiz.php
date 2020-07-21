@@ -36,6 +36,8 @@ class Quiz
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\Expression("(this.getPlageHoraireDebut() and this.getPlageHoraireFin() and this.getPlageHoraireDebut() < this.getPlageHoraireFin()) or (this.getPlageHoraireDebut() == false and this.getPlageHoraireFin() == false)",
+     * message = "La date de fin doit être postérieure à la date de début.")
      */
     private $plageHoraireFin;
 
@@ -131,7 +133,8 @@ class Quiz
      * @param int $length
      * @return string
      */
-    public function generateRandomString($length = 5) {
+    public function generateRandomString($length = 5)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -146,6 +149,4 @@ class Quiz
     {
         return "sa";
     }
-
-
 }

@@ -36,16 +36,30 @@ $(document).ready(function () {
     $submittedForm.submit();
   });
 
-  $(function () {
-    $("#datetimepicker1").datetimepicker();
-    $("#datetimepicker2").datetimepicker({
-      useCurrent: false,
-    });
-    $("#datetimepicker1").on("change.datetimepicker", function (e) {
-      let $test = $("#datetimepicker2").datetimepicker("minDate", e.date);
-    });
-    $("#datetimepicker2").on("change.datetimepicker", function (e) {
-      $("#datetimepicker1").datetimepicker("maxDate", e.date);
-    });
-  });
+  // $(function (e) {
+  //   $("#datetimepicker1").datetimepicker({
+  //     format: "Y-M-D h:m:s",
+  //   });
+  //   $("#datetimepicker2").datetimepicker({
+  //     useCurrent: false,
+  //     format: "Y-M-D h:m:s",
+  //   });
+  //   $("#datetimepicker1").on("change.datetimepicker", function (e) {
+  //     $("#datetimepicker2").datetimepicker("minDate", e.date);
+  //     $("#datetimepicker2").find(".bootstrap-datetimepicker-widget").hide();
+  //     let dateDebut = $("#datetimepicker2").datetimepicker("viewDate");
+  //   });
+  //   $("#datetimepicker2").on("change.datetimepicker", function (e) {
+  //     $("#datetimepicker1").datetimepicker("maxDate", e.date);
+  //     $("#datetimepicker1").find(".bootstrap-datetimepicker-widget").hide();
+  //     let dateFin = $("#datetimepicker1").datetimepicker("viewDate");
+  //   });
+
+  //   $(document).on("mousedown", function (e) {
+  //     var container = $(".bootstrap-datetimepicker-widget");
+  //     if (!container.is(e.target) && container.has(e.target).length === 0) {
+  //       container.hide();
+  //     }
+  //   });
+  // });
 });
