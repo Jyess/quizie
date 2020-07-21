@@ -326,6 +326,7 @@ class QuizController extends AbstractController
         //si aucun resultat, on va direct sur la page des stat
         if (!$statArray) {
             return $this->render('quiz/stat_quiz.html.twig', [
+                'leQuiz' => $quiz,
                 'nbResultats' => 0
             ]);
         }

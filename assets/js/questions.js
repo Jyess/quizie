@@ -58,6 +58,12 @@ function ajoutFormulaireReponse($reponsesContainer, $buttonContainer) {
   vraiFauxValues($formHolder);
 }
 
+/**
+ * Gère l'affichage et la suppression des boutons ajouter et supprimer reponse.s
+ * @param nbReponses
+ * @param $boutonAjoutReponse
+ * @param $boutonDeleteReponse
+ */
 function addDeleteReponse(
   nbReponses,
   $boutonAjoutReponse,
@@ -127,6 +133,9 @@ function boutonAjoutReponsesEtFormulaires(idQuestion) {
   });
 }
 
+/**
+ * Modifie le numéro des questions pour qu'il soit toujours régulier
+ */
 function changeOrdreQuestion() {
   // met le numéro de chaque question dans l'ordre
   // pour tous les formulaires de question créés
@@ -137,7 +146,7 @@ function changeOrdreQuestion() {
 }
 
 /**
- * Créer un formulaire pour ajouter une question
+ * Crée un formulaire pour ajouter une question
  */
 function ajoutFormulaireQuestion() {
   //enlève le bouton 'Ajouter une question' qui vient d'être cliqué
@@ -181,6 +190,10 @@ function ajoutFormulaireQuestion() {
     });
 }
 
+/**
+ * Affiche les questions deja creees d'un quiz
+ * @param $quizId
+ */
 function afficherQuestionsDejaCreees($quizId) {
   $.ajax({
     type: "POST",
@@ -231,6 +244,10 @@ function afficherQuestionsDejaCreees($quizId) {
   });
 }
 
+/**
+ * Attribue les valeurs vrai/faux au input
+ * @param $questionHolder
+ */
 function vraiFauxValues($questionHolder) {
   // met l'attribut vraiFaux à faux pour les réponses fausses
   $questionHolder.find(".reponses input[id$='vraiFaux']").each(function () {
