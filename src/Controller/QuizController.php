@@ -123,6 +123,7 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/quiz/page/{page}", defaults={"page"=1}, name="quiz_tousLesQuiz")
+     * @param $page
      * @param Request $request
      * @param QuizRepository $quizRepository
      * @param PaginatorInterface $paginator
@@ -427,13 +428,12 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/stat/mes-quiz/{idUser}", name="quiz_voirStatMesQuiz")
-     * @param $idQuiz
+     * @param $idUser
      * @param Request $request
      * @param QuizRepository $quizRepository
      * @param ResultatRepository $resultatRepository
      * @param QuizService $quizService
      * @return Response
-     * @throws NonUniqueResultException
      */
     public function voirStatMesQuiz($idUser, Request $request, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
@@ -465,12 +465,11 @@ class QuizController extends AbstractController
 
     /**
      * @Route("/export-resultats/mes-quiz/{idUser}", name="quiz_exportResultatsCSVMesQuiz")
-     * @param $idQuiz
+     * @param $idUser
      * @param QuizRepository $quizRepository
      * @param ResultatRepository $resultatRepository
      * @param QuizService $quizService
      * @return Response
-     * @throws NonUniqueResultException
      */
     public function exportResultatsCSVMesQuiz($idUser, QuizRepository $quizRepository, ResultatRepository $resultatRepository, QuizService $quizService)
     {
@@ -482,7 +481,7 @@ class QuizController extends AbstractController
 
         $statArray = $quizService->statData($idUser, 'user');
 
-        $filename = "Résultats globaux de mes Quiz" . " - " . $user->getNom();
+        $filename = "Résultats globaux de mes quiz" . " - " . $user->getNom();
 
         $response = new Response();
 

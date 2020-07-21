@@ -9,6 +9,7 @@ use App\Entity\Utilisateur;
 use App\Repository\QuestionRepository;
 use App\Repository\QuizRepository;
 use App\Repository\ResultatRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
@@ -101,7 +102,7 @@ class QuizService
      * @param $idQuiz
      * @param null $idQuestion
      * @return Quiz[]|bool|object[]
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function isOwner($idQuiz, $idQuestion = null)
     {
@@ -178,7 +179,8 @@ class QuizService
 
     /**
      * Retourne un array de data d'un quiz.
-     * @param $idQuiz
+     * @param $id
+     * @param $quizOrUser
      * @return array
      */
     public function statData($id, $quizOrUser)

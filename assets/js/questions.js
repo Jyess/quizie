@@ -233,21 +233,11 @@ function afficherQuestionsDejaCreees($quizId) {
 
 function vraiFauxValues($questionHolder) {
   // met l'attribut vraiFaux à faux pour les réponses fausses
-  $questionHolder
-    .find(".reponses")
-    .children()
-    .each(function (index) {
-      $(this)
-        .find("#question_reponses_" + index + "_vraiFaux")
-        .val("0");
-    });
+  $questionHolder.find(".reponses input[id$='vraiFaux']").each(function () {
+    $(this).val("0"); //d'abord tous réponse fausse
+  });
 
-  // met la première réponse à vrai
-  $questionHolder
-    .find(".reponses")
-    .children()
-    .find("#question_reponses_0_vraiFaux")
-    .val("1");
+  $questionHolder.find(".reponses input[id$='vraiFaux']").first().val("1"); //premier label de chaque question
 }
 
 $(document).ready(function () {
@@ -275,6 +265,10 @@ $(document).ready(function () {
 
   // enregistrement ou modification d'une question dans la base de données
   $(document).on("submit", "form", function (e) {
+    $(window).on("beforeunload", function () {
+      return ""; //inutile car pas afficher
+    });
+
     e.preventDefault();
 
     if ($(".error_form")) $(".error_form").remove();
@@ -428,9 +422,5 @@ $(document).ready(function () {
     $(this)
       .siblings("input")
       .val(Math.floor(Math.random() * -20));
-  });
-
-  $(window).on("beforeunload", function () {
-    return ""; //inutile car pas afficher
   });
 });
