@@ -20,13 +20,29 @@
 
 	<div class="row mt-3">
 		<div class="col-lg-6 ">
-			{{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début', {'label_attr': {'class': 'optional'}}) }}
-			{{ form_widget(quiz_formulaire.plageHoraireDebut, {'attr' : { 'class' : 'optional'} }) }}
+			<div class="form-group optional">
+				{{ form_label(quiz_formulaire.plageHoraireDebut, 'Plage horaire de début') }}
+				<div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+					{{ form_widget(quiz_formulaire.plageHoraireDebut) }}
+					<div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+						<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 
 		<div class="col-lg-6">
-			{{ form_label(quiz_formulaire.plageHoraireFin, 'Plage horaire de fin', {'label_attr': {'class': ' optional'}}) }}
-			{{ form_widget(quiz_formulaire.plageHoraireFin, {'attr' : { 'class' : 'optional'} }) }}
+			<div class="form-group optional">
+				{{ form_label(quiz_formulaire.plageHoraireFin, 'Plage horaire de fin') }}
+
+				<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+					{{ form_widget(quiz_formulaire.plageHoraireFin) }}
+					<div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+						<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 

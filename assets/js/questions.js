@@ -1,4 +1,4 @@
-const $ = require("jquery");
+// const $ = require("jquery");
 
 /*
 initialise une variable correspondant à l'id d'une question
@@ -440,4 +440,14 @@ $(document).ready(function () {
       .siblings("input")
       .val(Math.floor(Math.random() * -20));
   });
+
+  if ($("#copy")) {
+    $(function () {
+      $('[data-toggle="popover"]').popover();
+    });
+
+    $("#copy").on("click", function () {
+      $("#element").popover("show");
+    });
+  }
 });

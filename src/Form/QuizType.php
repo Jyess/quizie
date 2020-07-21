@@ -38,13 +38,18 @@ class QuizType extends AbstractType
             ->add('plageHoraireDebut', DateTimeType::class, [
                 'required' => false,
                 'widget' => 'single_text',
+                'html5' => false,
                 'attr' => [
-                    'min' => (new \DateTime())->format('d-m-Y H:i')
+                    'data-target' => '#datetimepicker1'
                 ]
             ])
             ->add('plageHoraireFin', DateTimeType::class, [
                 'required' => false,
                 'widget' => 'single_text',
+                'html5' => false,
+                'attr' => [
+                    'data-target' => '#datetimepicker2'
+                ],
                 'help' => "Vous pouvez définir une plage horaire pour laquelle votre quiz sera disponible."
             ])
             ->add('envoyer', SubmitType::class, [

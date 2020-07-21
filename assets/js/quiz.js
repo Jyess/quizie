@@ -1,4 +1,4 @@
-const $ = require("jquery");
+// const $ = require("jquery");
 
 function displayOrHideOptionalFields() {
   let selected_option_value = $("#quiz_etat").val(); //valeur de la sélection de l'état du quiz
@@ -34,5 +34,18 @@ $(document).ready(function () {
 
     let $submittedForm = $currentButton.closest("form");
     $submittedForm.submit();
+  });
+
+  $(function () {
+    $("#datetimepicker1").datetimepicker();
+    $("#datetimepicker2").datetimepicker({
+      useCurrent: false,
+    });
+    $("#datetimepicker1").on("change.datetimepicker", function (e) {
+      let $test = $("#datetimepicker2").datetimepicker("minDate", e.date);
+    });
+    $("#datetimepicker2").on("change.datetimepicker", function (e) {
+      $("#datetimepicker1").datetimepicker("maxDate", e.date);
+    });
   });
 });

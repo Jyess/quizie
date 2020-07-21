@@ -188,7 +188,7 @@ class QuizController extends AbstractController
             }
 
             //quiz privé  et clé non saisie ? on demande l'acces
-            if ($isKeyProtected && !$cleAccesSaisie) {
+            if ($isKeyProtected && $cleAccesSaisie === null) {
                 return $this->render('quiz/demande_acces.html.twig', [
                     'leQuiz' => $leQuiz
                 ]);

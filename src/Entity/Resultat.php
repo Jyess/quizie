@@ -25,7 +25,7 @@ class Resultat
     private $score;
 
     /**
-     * @ORM\ManyToOne(targetEntity=quiz::class)
+     * @ORM\ManyToOne(targetEntity=quiz::class, cascade={"remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $quiz;

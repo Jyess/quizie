@@ -1,4 +1,4 @@
-const $ = require("jquery");
+// const $ = require("jquery");
 
 $(window).on("load", function () {
   // id du quiz
