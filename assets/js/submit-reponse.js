@@ -27,7 +27,7 @@ $(document).on("submit", "form", function (e) {
         $currentButton.remove();
         $("#quizSubmitted").append(
           '<div class="alert alert-success" role="alert">Vos réponses ont été enregistrées !</div>' +
-            `<a class="btn btn-secondary" href="/quiz" role="button">Faire un autre quiz</a>`
+            `<a class="btn btn-secondary" href="/quiz/page" role="button">Faire un autre quiz</a>`
         );
       }
     },
