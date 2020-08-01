@@ -19,10 +19,14 @@ require("bootstrap");
 require("@fortawesome/fontawesome-free/css/all.min.css");
 require("@fortawesome/fontawesome-free/js/all.js");
 
-require("tempusdominus-bootstrap-4");
+// require("tempusdominus-bootstrap-4");
 
 // const routes = require("../../public/js/fos_js_routes.json");
 // import Routing from "../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js";
 //
 // Routing.setRoutingData(routes);
 // Routing.generate("rep_log_list");
+
+$("#test").on("click", function (event) {
+  $("#modal").modal("show");
+});

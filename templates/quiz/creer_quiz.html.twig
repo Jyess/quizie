@@ -25,10 +25,10 @@
 				<div class="input-group date" id="datetimepicker1" data-target-input="nearest">
 					{{ form_widget(quiz_formulaire.plageHoraireDebut) }}
 					{# <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-											<div class="input-group-text">
-												<i class="fa fa-calendar"></i>
-											</div>
-										</div> #}
+																					<div class="input-group-text">
+																						<i class="fa fa-calendar"></i>
+																					</div>
+																				</div> #}
 				</div>
 			</div>
 
@@ -41,8 +41,8 @@
 				<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
 					{{ form_widget(quiz_formulaire.plageHoraireFin) }}
 					{# <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-																<div class="input-group-text"><i class="fa fa-calendar"></i></div>
-															</div> #}
+																										<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+																									</div> #}
 				</div>
 			</div>
 		</div>
@@ -55,6 +55,10 @@
 	{{ form_row(quiz_formulaire.envoyer, {'attr' : { 'class' : 'btn btn-primary mt-3 col-lg-3'} } ) }}
 
 	{{ form_end(quiz_formulaire) }}
+
+	<button id="test" type="button" class="btn btn-primary">Cliquez-moi</button>
+
+	{{ render(controller('App\\Controller\\AccueilController::modal')) }}
 {% endblock %}
 
 {% block javascripts %}

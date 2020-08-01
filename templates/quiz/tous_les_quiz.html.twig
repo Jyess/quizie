@@ -10,7 +10,8 @@
 		{% for quiz in pagination %}
 			<a class="list-group-item list-group-item-action" href="{{ path('quiz_afficherQuiz', {'idQuiz' : quiz.id}) }}">
 				{{ quiz.intitule|trimLong(40) }}
-				<span class="font-italic"> |
+				<span class="font-italic">
+					|
 					<span class="font-weight-bold">{{ quiz.utilisateurCreateur.prenom ~ ' ' ~ quiz.utilisateurCreateur.nom }}</span>
 				</span>
 
@@ -42,15 +43,17 @@
 		{{ knp_pagination_render(pagination) }}
 	</div>
 
-{#	<nav aria-label="Page navigation example">#}
-{#		<ul class="pagination">#}
-{#			<li class="page-item"><a class="page-link" href="#">Précédent</a></li>#}
-{#			<li class="page-item"><a class="page-link" href="#">1</a></li>#}
-{#			<li class="page-item"><a class="page-link" href="#">2</a></li>#}
-{#			<li class="page-item"><a class="page-link" href="#">3</a></li>#}
-{#			<li class="page-item"><a class="page-link" href="#">Suivant</a></li>#}
-{#		</ul>#}
-{#	</nav>#}
+	{#	<nav aria-label="Page navigation example">#}
+	{#		<ul class="pagination">#}
+	{#			<li class="page-item"><a class="page-link" href="#">Précédent</a></li>#}
+	{#			<li class="page-item"><a class="page-link" href="#">1</a></li>#}
+	{#			<li class="page-item"><a class="page-link" href="#">2</a></li>#}
+	{#			<li class="page-item"><a class="page-link" href="#">3</a></li>#}
+	{#			<li class="page-item"><a class="page-link" href="#">Suivant</a></li>#}
+	{#		</ul>#}
+	{#	</nav>#}<button id="test" type="button" class="btn btn-primary"> Cliquez-moi</button>
+
+	{{ render(controller('App\\Controller\\AccueilController::modal')) }}
 {% endblock %}
 
 {% block javascripts %}

@@ -17,4 +17,12 @@ class AccueilController extends AbstractController
             'controller_name' => 'AccueilController',
         ]);
     }
+
+    /**
+     * @Route("/modal", name="accueil_modal")
+     */
+    public function modal()
+    {
+        return $this->render('modal.html.twig');
+    }
 }
