@@ -23,18 +23,18 @@
 
 				<div class="row col-lg-2 m-auto pt-lg-0 pt-2 pb-lg-0 pb-4">
 					<div class="col text-center">
-						<a href="{{ path("quiz_modifierQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Modifier le quiz">
-							<i class="fas fa-pen"></i>
+						<a href="{{ path("quiz_modifierQuiz", { 'idQuiz' : unQuiz.id }) }}">
+							<i class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Modifier le quiz"></i>
 						</a>
 					</div>
 					<div class="col text-center">
-						<a class="text-danger supprimerQuiz" href="{{ path("quiz_deleteQuiz", { 'idQuiz' : unQuiz.id }) }}" title="Supprimer le quiz">
-							<i class="fas fa-trash"></i>
+						<a class="text-danger supprimerQuiz" href="{{ path("quiz_deleteQuiz", { 'idQuiz' : unQuiz.id }) }}">
+							<i class="fas fa-trash" data-toggle="tooltip" data-placement="top" title="Supprimer le quiz"></i>
 						</a>
 					</div>
 					<div class="col text-center">
-						<a class="text-info statQuiz" href="{{ path("quiz_voirStat", { 'idQuiz' : unQuiz.id }) }}" title="Statistiques du quiz">
-							<i class="far fa-chart-bar"></i>
+						<a class="text-info statQuiz" href="{{ path("quiz_voirStat", { 'idQuiz' : unQuiz.id }) }}">
+							<i class="far fa-chart-bar" data-toggle="tooltip" data-placement="top" title="Statistiques du quiz"></i>
 						</a>
 					</div>
 				</div>

@@ -30,3 +30,7 @@ require("@fortawesome/fontawesome-free/js/all.js");
 $("#test").on("click", function (event) {
   $("#modal").modal("show");
 });
+
+$(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
