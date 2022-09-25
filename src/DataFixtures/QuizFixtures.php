@@ -7,7 +7,6 @@ use App\Entity\Quiz;
 use App\Entity\Reponse;
 use App\Entity\Resultat;
 use App\Entity\Utilisateur;
-use App\Repository\UtilisateurRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class QuizFixtures extends Fixture
@@ -20,42 +19,32 @@ class QuizFixtures extends Fixture
 
         $batchSize = 10;
 
-        //création des users
-        for ($i = 0; $i < 200; $i++) {
-            $utilisateur = new Utilisateur();
+        //création d'un user
+        $utilisateur = new Utilisateur();
 
-            $utilisateur->setNom($faker->lastName);
-            $utilisateur->setPrenom($faker->firstName);
-            $utilisateur->setEmail($faker->unique()->email);
-            $utilisateur->setPassword(\password_hash('azerty', \PASSWORD_BCRYPT));
+        $utilisateur->setNom($faker->lastName);
+        $utilisateur->setPrenom($faker->firstName);
+        $utilisateur->setEmail('admin@gmail.com');
+        $utilisateur->setPassword(\password_hash('azerty', \PASSWORD_BCRYPT));
 
-            $manager->persist($utilisateur);
-
-            if (($i % $batchSize) === 0) {
-                $manager->flush(); // Executes all updates.
-                $manager->clear(); // Detaches all objects from Doctrine!
-            }
-        }
+        $manager->persist($utilisateur);
+        $manager->flush();
 
         //création des quiz
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $quiz = new Quiz();
 
             $quiz->setIntitule($faker->text);
             $quiz->setPlageHoraireDebut($faker->dateTimeBetween('-1 month', 'now'));
             $quiz->setPlageHoraireFin($faker->dateTimeBetween('now', '+1 month'));
             $quiz->setCleAcces($quiz->generateRandomString());
-            $quiz->setUtilisateurCreateur($manager->getRepository('App:Utilisateur')->find($faker->numberBetween(1,200)));
+            $quiz->setUtilisateurCreateur($utilisateur);
 
             $manager->persist($quiz);
-
-            if (($i % $batchSize) === 0) {
-                $manager->flush(); // Executes all updates.
-                $manager->clear(); // Detaches all objects from Doctrine!
-            }
+            $manager->flush();
         }
 
-        $tousLesQuiz = $manager->getRepository('App:Quiz')->findAll();
+        $tousLesQuiz = $manager->getRepository(Quiz::class)->findAll();
 
         //création des questions
         for($quiz = 0; $quiz < count($tousLesQuiz); $quiz++) {
@@ -72,12 +61,12 @@ class QuizFixtures extends Fixture
                 if (($i % $batchSize) === 0) {
                     $manager->flush();
                     $manager->clear(); // Detaches all objects from Doctrine!
-                    $tousLesQuiz = $manager->getRepository('App:Quiz')->findAll();
+                    $tousLesQuiz = $manager->getRepository(Quiz::class)->findAll();
                 }
             }
         }
 
-        $toutesLesQuestions = $manager->getRepository('App:Question')->findAll();
+        $toutesLesQuestions = $manager->getRepository(Question::class)->findAll();
 
         //création des reponses
         for ($question = 0; $question < count($toutesLesQuestions); $question++) {
@@ -99,8 +88,8 @@ class QuizFixtures extends Fixture
                 if (($i % $batchSize) === 0) {
                     $manager->flush();
                     $manager->clear(); // Detaches all objects from Doctrine!
-                    $toutesLesQuestions = $manager->getRepository('App:Question')->findAll();
-                    $tousLesQuiz = $manager->getRepository('App:Quiz')->findAll();
+                    $toutesLesQuestions = $manager->getRepository(Question::class)->findAll();
+                    $tousLesQuiz = $manager->getRepository(Quiz::class)->findAll();
                 }
             }
         }
