@@ -31,7 +31,7 @@
 
 ## About
 This project was made during my internship at Evalandgo (now called Qwesteo). The goal was to get used to the Symfony framework in a context that is the closest to 
-what I was going to work with. The name of the application was inspired by the name of the company. I also tried to use the same graphic charter.
+what I was going to work with. I also tried to use the same graphic charter.
 
 ### Built with
 [![Symfony][Symfony-img]][Symfony-url]
