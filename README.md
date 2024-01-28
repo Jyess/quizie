@@ -30,8 +30,8 @@
 </details>
 
 ## About
-This project was made during my internship at Evalandgo (now called Qwesteo). The goal was to get used to the Symfony framework in a context that is the closest to 
-what I was going to work with.
+This project was made during my internship at Qwesteo. The goal was to get used to the Symfony framework in a context that is the closest to 
+what I was going to work on.
 
 ### Built with
 [![Symfony][Symfony-img]][Symfony-url]
