@@ -4,7 +4,7 @@
   <h3 align="center">Quizie</h3>
 
   <p align="center">
-    A web application to make quizes, collect answers and analyze them.
+    A web application to make quizzes, collect answers and analyze them.
     <br><br>
     <a href="https://github.com/Jyess/quizie/issues">Report a bug</a>
   </p>
